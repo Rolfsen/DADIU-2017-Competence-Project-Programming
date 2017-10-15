@@ -26,7 +26,6 @@ public class PlayerMovement : MonoBehaviour
 	private Rigidbody rb;
 	private float prevY;
 	private bool doubleJump;
-	private bool doubleJumpStep;
 
 	private void Awake()
 	{
@@ -36,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		
 		if (currentState == PlayerState.idle)
 		{
 			Idle();
@@ -72,14 +72,12 @@ public class PlayerMovement : MonoBehaviour
 			}
 			currentState = PlayerState.running;
 		}
-
 		if (Input.GetKeyDown(jumpKey))
 		{
 			Jump();
 			currentState = PlayerState.jumping;
 		}
 	}
-
 	void Running()
 	{
 		movePlayer();
@@ -99,36 +97,23 @@ public class PlayerMovement : MonoBehaviour
 			currentState = PlayerState.jumping;
 		}
 	}
-
-	void Jump()
-	{
-		rb.velocity = new Vector3(rb.velocity.x,0,rb.velocity.z);
-		rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
-	}
-
-	void movePlayer()
-	{
-		if (currentDir == MovementDir.left)
-		{
-			transform.Translate(Vector3.left * movementSpeed * Time.deltaTime);
-		}
-		if (currentDir == MovementDir.right)
-		{
-			transform.Translate(Vector3.right * movementSpeed * Time.deltaTime);
-		}
-	} 
-
 	void Jumping()
 	{
+		if (rb.velocity.y == 0)
+		{
+			doubleJump = false;
+			currentState = PlayerState.idle;
+			return;
+		}
+
 		if (Input.GetKeyDown(jumpKey) && doubleJump == false)
 		{
 			Jump();
 			doubleJump = true;
-			doubleJumpStep = true;
 		}
 
 		movePlayer();
-		
+
 		if (Input.GetKey(moveRight) == false && currentDir == MovementDir.right)
 		{
 			currentDir = MovementDir.none;
@@ -137,12 +122,22 @@ public class PlayerMovement : MonoBehaviour
 		{
 			currentDir = MovementDir.none;
 		}
+	}
+	void Jump()
+	{
+		rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+		rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+	}
 
-		if (rb.velocity.y == 0 && doubleJumpStep == false)
+	void movePlayer()
+	{
+		if (currentDir == MovementDir.left)
 		{
-			doubleJump = false;
-			currentState = PlayerState.idle;
+			rb.MovePosition(transform.position + -transform.right*movementSpeed*Time.deltaTime);
 		}
-		doubleJumpStep = false;
+		if (currentDir == MovementDir.right)
+		{
+			rb.MovePosition(transform.position + transform.right * movementSpeed * Time.deltaTime);
+		}
 	}
 }

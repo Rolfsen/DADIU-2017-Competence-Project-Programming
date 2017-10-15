@@ -64,6 +64,11 @@ public class EventManager : MonoBehaviour
 		}
 	}
 
+	public static void RemoveAllListerners()
+	{
+		instance.eventDictionary.Clear();
+	}
+
 	public static void TriggerEvent(string eventName)
 	{
 		UnityEvent thisEvent = null;
