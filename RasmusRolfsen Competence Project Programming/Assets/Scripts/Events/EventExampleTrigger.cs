@@ -5,12 +5,15 @@ using UnityEngine;
 public class EventExampleTrigger : MonoBehaviour
 {
 
+	[SerializeField]
+	Vector2 message;
 
+	
 	void Update()
 	{
 		if (Input.GetKeyDown(KeyCode.A))
 		{
-			EventManager.TriggerEvent("DebugEvent");
+			EventManager2.TriggerEvent("DebugEvent", message);
 		}
 	}
 }

@@ -4,12 +4,8 @@ using UnityEngine;
 
 public class PlayerMovement1 : MonoBehaviour
 {
-	[SerializeField]
-	private float movementSpeed = 5;
-	[SerializeField]
-	private float jumpPower = 30;
 
-	private enum PlayerState { idle, running, jumping, blocking, dashing };
+	private enum PlayerState { idle, running, jumping, blocking, dashing, falling };
 	private enum MovementDir { left, right, none };
 	[SerializeField]
 	private PlayerState currentState = PlayerState.idle;
@@ -17,14 +13,25 @@ public class PlayerMovement1 : MonoBehaviour
 	private MovementDir currentDir = MovementDir.right;
 
 	[SerializeField]
+	private float movementSpeed = 5;
+	[SerializeField]
+	private float jumpPower = 30;
+	[SerializeField]
+	private float blockMaxDuration = 3;
+	[SerializeField]
+	private float blockCooldown = 3;
+
+	[SerializeField]
+	private KeyCode blockKey = KeyCode.LeftControl;
+	[SerializeField]
 	private KeyCode moveLeft = KeyCode.A;
 	[SerializeField]
 	private KeyCode moveRight = KeyCode.D;
 	[SerializeField]
 	private KeyCode jumpKey = KeyCode.Space;
 
+	private bool blockReady;
 	private Rigidbody rb;
-	private float prevY;
 	private bool doubleJump;
 
 	private void Awake()
@@ -32,10 +39,14 @@ public class PlayerMovement1 : MonoBehaviour
 		rb = GetComponent<Rigidbody>();
 	}
 
-	// Update is called once per frame
-	void Update()
+	private void Start()
 	{
-		
+		blockReady = true;
+	}
+
+	// Update is called once per frame
+	private void Update()
+	{
 		if (currentState == PlayerState.idle)
 		{
 			Idle();
@@ -48,18 +59,29 @@ public class PlayerMovement1 : MonoBehaviour
 		{
 			Jumping();
 		}
+		else if (currentState == PlayerState.blocking)
+		{
+			Blocking();
+		}
+		else if (currentState == PlayerState.falling)
+		{
+			Falling();
+		}
 	}
 
 	private void FixedUpdate()
 	{
-		if (rb.velocity.y != 0)
+		if (rb.velocity.y != 0 && currentState != PlayerState.falling)
 		{
 			currentState = PlayerState.jumping;
 		}
 	}
 
-	void Idle()
+
+	// Functions that handle players states and execute player movement
+	private void Idle()
 	{
+		AnyStateActions();
 		if (Input.GetKey(moveLeft) || Input.GetKey(moveRight))
 		{
 			if (Input.GetKey(moveLeft))
@@ -74,14 +96,15 @@ public class PlayerMovement1 : MonoBehaviour
 		}
 		if (Input.GetKeyDown(jumpKey))
 		{
-			Jump();
+			Jump(jumpPower);
 			currentState = PlayerState.jumping;
 		}
 	}
 
-	void Running()
+	private void Running()
 	{
 		movePlayer();
+		AnyStateActions();
 
 		if (Input.GetKey(moveRight) == false && currentDir == MovementDir.right)
 		{
@@ -94,12 +117,12 @@ public class PlayerMovement1 : MonoBehaviour
 
 		if (Input.GetKeyDown(jumpKey))
 		{
-			Jump();
+			Jump(jumpPower);
 			currentState = PlayerState.jumping;
 		}
 	}
 
-	void Jumping()
+	private void Jumping()
 	{
 		if (rb.velocity.y == 0)
 		{
@@ -110,11 +133,12 @@ public class PlayerMovement1 : MonoBehaviour
 
 		if (Input.GetKeyDown(jumpKey) && doubleJump == false)
 		{
-			Jump();
+			Jump(jumpPower);
 			doubleJump = true;
 		}
 
 		movePlayer();
+		AnyStateActions();
 
 		if (Input.GetKey(moveLeft))
 		{
@@ -124,7 +148,7 @@ public class PlayerMovement1 : MonoBehaviour
 		{
 			currentDir = MovementDir.right;
 		}
-		
+
 		if (Input.GetKey(moveRight) == false && currentDir == MovementDir.right)
 		{
 			currentDir = MovementDir.none;
@@ -135,21 +159,66 @@ public class PlayerMovement1 : MonoBehaviour
 		}
 	}
 
-	void Jump()
+	private void Falling()
 	{
-		rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-		rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+		if (rb.velocity.y == 0)
+		{
+			currentState = PlayerState.idle;
+		}
 	}
 
-	void movePlayer()
+
+	// Functions that control player movement
+	private void AnyStateActions()
+	{
+		if (Input.GetKey(blockKey) && blockReady)
+		{
+			StartCoroutine(BlockTimer());
+			currentState = PlayerState.blocking;
+		}
+	}
+
+	private void movePlayer()
 	{
 		if (currentDir == MovementDir.left)
 		{
-			rb.MovePosition(transform.position + -transform.right*movementSpeed*Time.deltaTime);
+			rb.MovePosition(transform.position + -transform.right * movementSpeed * Time.deltaTime);
 		}
 		if (currentDir == MovementDir.right)
 		{
 			rb.MovePosition(transform.position + transform.right * movementSpeed * Time.deltaTime);
 		}
+	}
+	private void Blocking()
+	{
+		rb.velocity = Vector3.zero;
+		if (Input.GetKeyUp(blockKey))
+		{
+			BlockDone();
+		}
+	}
+
+	public void Jump(float jumpStrength)
+	{
+		rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+		rb.AddForce(Vector3.up * jumpStrength, ForceMode.Impulse);
+	}
+
+	void BlockDone ()
+	{
+		blockReady = false;
+		StartCoroutine(BlockCooldown());
+		currentState = PlayerState.falling;
+	}
+
+	IEnumerator BlockTimer()
+	{
+		yield return new WaitForSeconds(blockMaxDuration);
+		BlockDone();
+	}
+	IEnumerator BlockCooldown()
+	{
+		yield return new WaitForSeconds(blockCooldown);
+		blockReady = true;
 	}
 }

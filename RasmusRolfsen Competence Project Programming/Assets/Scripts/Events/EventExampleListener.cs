@@ -11,24 +11,24 @@ public class EventExampleListener : MonoBehaviour
 	// Remove event when object is destroyed
 	private void OnDestroy()
 	{
-		EventManager.StopListening("DebugEvent", DebugEvent);
+		EventManager2.StopListening("DebugEvent", DebugEvent);
 	}
 
 	// Enable the event
 	private void OnEnable()
 	{
-		EventManager.StartListening("DebugEvent", DebugEvent);
+		EventManager2.StartListening("DebugEvent", DebugEvent);
 	}
 
 	// Disable the event
 	private void OnDisable()
 	{
-		EventManager.StopListening("DebugEvent", DebugEvent);
+		EventManager2.StopListening("DebugEvent", DebugEvent);
 	}
 
 	// Function To Be Executed
-	void DebugEvent()
+	void DebugEvent(object e)
 	{
-		Debug.Log(logMessage);
+		Debug.Log(e);
 	}
 }
