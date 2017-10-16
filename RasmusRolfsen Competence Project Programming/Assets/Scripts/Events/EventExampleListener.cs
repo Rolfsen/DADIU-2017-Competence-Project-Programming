@@ -5,25 +5,23 @@ using UnityEngine;
 
 public class EventExampleListener : MonoBehaviour
 {
-	[SerializeField]
-	private string logMessage;
 
 	// Remove event when object is destroyed
 	private void OnDestroy()
 	{
-		EventManager2.StopListening("DebugEvent", DebugEvent);
+		EventManager.StopListening("DebugEvent", DebugEvent);
 	}
 
 	// Enable the event
 	private void OnEnable()
 	{
-		EventManager2.StartListening("DebugEvent", DebugEvent);
+		EventManager.StartListening("DebugEvent", DebugEvent);
 	}
 
 	// Disable the event
 	private void OnDisable()
 	{
-		EventManager2.StopListening("DebugEvent", DebugEvent);
+		EventManager.StopListening("DebugEvent", DebugEvent);
 	}
 
 	// Function To Be Executed
