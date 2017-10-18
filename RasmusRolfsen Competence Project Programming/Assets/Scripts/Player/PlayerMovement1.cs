@@ -5,12 +5,12 @@ using UnityEngine;
 public class PlayerMovement1 : MonoBehaviour
 {
 	
-	private enum PlayerState { idle, running, jumping, blocking, dashing, falling };
-	private enum MovementDir { left, right, none };
+	public enum PlayerState { idle, running, jumping, blocking, dashing, falling };
+	public enum MovementDir { left, right, none };
 	[SerializeField]
-	private PlayerState currentState = PlayerState.idle;
+	public PlayerState currentState = PlayerState.idle;
 	[SerializeField]
-	private MovementDir currentDir = MovementDir.right;
+	public MovementDir currentDir = MovementDir.right;
 
 	[SerializeField]
 	private float movementSpeed = 5;
@@ -34,9 +34,12 @@ public class PlayerMovement1 : MonoBehaviour
 	private Rigidbody rb;
 	private bool doubleJump;
 
+	private bool floorCol;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
+		EventManager.StartListening("GroundCollision", GroundCol);
 	}
 
 	private void Start()
@@ -67,6 +70,8 @@ public class PlayerMovement1 : MonoBehaviour
 		{
 			Falling();
 		}
+
+		floorCol = false;
 	}
 
 	private void FixedUpdate()
@@ -124,10 +129,11 @@ public class PlayerMovement1 : MonoBehaviour
 
 	private void Jumping()
 	{
-		if (rb.velocity.y == 0)
+		if (rb.velocity.y == 0 && floorCol)
 		{
 			doubleJump = false;
 			currentState = PlayerState.idle;
+			Debug.Log("Jump Over");
 			return;
 		}
 
@@ -220,5 +226,10 @@ public class PlayerMovement1 : MonoBehaviour
 	{
 		yield return new WaitForSeconds(blockCooldown);
 		blockReady = true;
+	}
+
+	private void GroundCol (object e)
+	{
+		floorCol = true;
 	}
 }
