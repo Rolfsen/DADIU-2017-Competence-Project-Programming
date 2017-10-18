@@ -22,6 +22,17 @@ public class PlayerCollision : MonoBehaviour
 		}
 	}
 
+
+	private void OnTriggerStay(Collider other)
+	{
+		switch (other.gameObject.tag)
+		{
+			case "Enemy":
+				EnemyCollision(other);
+				break;
+		}
+	}
+
 	private void GroundCollision(Collision collission)
 	{
 		bool check = false;
@@ -43,7 +54,10 @@ public class PlayerCollision : MonoBehaviour
 				EventManager.TriggerEvent("GroundCollision", null);
 			}
 		}
-
+	}
+	private void EnemyCollision(Collider collider)
+	{
+		Debug.Log("Player Collided with Enemy");
 	}
 
 }
