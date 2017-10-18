@@ -4,7 +4,7 @@ using UnityEngine;
 
 [System.Serializable]
 public struct Weapons
-{ 
+{
 	public string weaponName;
 	public int ammo;
 	public int reserveAmmo;
@@ -13,26 +13,27 @@ public struct Weapons
 	public float attackSpeed;
 }
 
-
 public class PlayerWeaponBehavior : MonoBehaviour
 {
-	private const int weaponCount = 5;
+	private const int WeaponCount = 5;
 
 	[SerializeField]
-	private bool[] unlocked = new bool[weaponCount];
+	private Weapons[] PlayerWeapons = new Weapons[WeaponCount];
 	[SerializeField]
-	private KeyCode[] weaponKeys = new KeyCode[weaponCount] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5 };
+	private KeyCode[] weaponKeys = new KeyCode[WeaponCount] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5 };
+	[SerializeField]
+	private bool[] unlocked = new bool[WeaponCount];
 
 	[SerializeField]
 	private float changeWeaponTime = 3f;
+	[SerializeField]
+	private float shotDist = 1000;
+
+
 	private bool changingWeapon = false;
+	private int currentWeapon = 0;
+	private bool shootCooldown = false;
 
-	[SerializeField]
-	private int currentWeapon;
-	private bool shootCooldown;
-
-	[SerializeField]
-	private Weapons[] PlayerWeapons = new Weapons[weaponCount];
 
 
 	private void Awake()
@@ -42,15 +43,12 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		Weapons Gun = new Weapons();
 		Gun.ammo = 5;
 		Debug.Log(Gun.ammo);
-	}
-
-	private void Start()
-	{
 		currentWeapon = 0;
 		shootCooldown = false;
-
 		changingWeapon = false;
 	}
+
+
 	private void UnlockWeapon(object e)
 	{
 		unlocked[(int)e] = true;
@@ -81,6 +79,10 @@ public class PlayerWeaponBehavior : MonoBehaviour
 			}
 		}
 	}
+	private void DissArm(object e)
+	{
+		StartCoroutine(ReArm((float)e));
+	}
 
 	IEnumerator ChangeWeapon(int newWeapon)
 	{
@@ -97,11 +99,9 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	{
 		Vector3 pScreenPos = Camera.main.WorldToScreenPoint(transform.position);
 		Vector3 dir = Input.mousePosition - pScreenPos;
-		Debug.DrawRay(transform.position, dir, Color.blue);
 		Ray ray = new Ray(transform.position, dir);
 		RaycastHit hit;
-
-		if (Physics.Raycast(ray, out hit, 400))
+		if (Physics.Raycast(ray, out hit, shotDist))
 		{
 			Debug.Log(hit.transform.gameObject);
 		}
@@ -119,11 +119,6 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	{
 		yield return new WaitForSeconds(PlayerWeapons[currentWeapon].reloadTime);
 		Debug.Log("Reload");
-	}
-
-	private void DissArm(object e)
-	{
-		StartCoroutine(ReArm((float)e));
 	}
 
 	IEnumerator ReArm(float time)

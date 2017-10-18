@@ -30,22 +30,19 @@ public class PlayerMovement1 : MonoBehaviour
 	[SerializeField]
 	private KeyCode jumpKey = KeyCode.Space;
 
-	private bool blockReady;
-	private Rigidbody rb;
-	private bool doubleJump;
+	private bool blockReady = true;
+	private bool doubleJump = false;
+	private bool floorCol = false;
 
-	private bool floorCol;
+	private Rigidbody rb;
 
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
 		EventManager.StartListening("GroundCollision", GroundCol);
-	}
-
-	private void Start()
-	{
 		blockReady = true;
 	}
+
 
 	// Update is called once per frame
 	private void Update()
