@@ -62,18 +62,6 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	private void Update()
 	{
-
-		Vector3 pScreenPos = Camera.main.WorldToScreenPoint(transform.position);
-		Vector3 dir =   Input.mousePosition-pScreenPos;
-		Debug.DrawRay(transform.position,dir,Color.blue);
-		Ray ray = new Ray(transform.position,dir);
-		RaycastHit hit;
-
-		if (Physics.Raycast(ray, out hit, 400))
-		{
-			Debug.Log(hit.transform.gameObject);
-		}
-
 		if (Input.anyKey)
 		{
 			if (Input.GetMouseButton(1) && PlayerWeapons[currentWeapon].ammo != 0 && !shootCooldown)
@@ -107,22 +95,22 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	IEnumerator Shoot()
 	{
+		Vector3 pScreenPos = Camera.main.WorldToScreenPoint(transform.position);
+		Vector3 dir = Input.mousePosition - pScreenPos;
+		Debug.DrawRay(transform.position, dir, Color.blue);
+		Ray ray = new Ray(transform.position, dir);
+		RaycastHit hit;
+
+		if (Physics.Raycast(ray, out hit, 400))
+		{
+			Debug.Log(hit.transform.gameObject);
+		}
 		Debug.Log("Shoot");
 		shootCooldown = true;
 		if (currentWeapon != 0)
 		{
 			PlayerWeapons[currentWeapon].ammo--;
 		}
-
-
-		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		Vector3 dir = mousePos - new Vector3(transform.position.x,transform.position.y,0);
-
-		Debug.DrawRay(transform.position,dir);
-
-		//RaycastHit hit = Physics.Raycast(new Vector3(transform.position.x,transform.position.y),dir);
-
-
 		yield return new WaitForSeconds(PlayerWeapons[currentWeapon].attackSpeed);
 		shootCooldown = false;
 	}
