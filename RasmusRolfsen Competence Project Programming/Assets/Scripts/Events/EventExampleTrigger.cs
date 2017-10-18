@@ -6,7 +6,7 @@ public class EventExampleTrigger : MonoBehaviour
 {
 
 	[SerializeField]
-	Vector3 message;
+	private Vector3 message;
 
 	
 	void Update()

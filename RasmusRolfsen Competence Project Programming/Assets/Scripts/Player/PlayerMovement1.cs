@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement1 : MonoBehaviour
 {
-
+	
 	private enum PlayerState { idle, running, jumping, blocking, dashing, falling };
 	private enum MovementDir { left, right, none };
 	[SerializeField]

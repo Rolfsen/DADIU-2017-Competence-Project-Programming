@@ -4,24 +4,24 @@ using UnityEngine;
 
 public class PlayerWeaponBehavior : MonoBehaviour
 {
-
+	[SerializeField]
+	private const int weaponCount = 5;
 	private enum weapons { gun, uzi, riffle, assaultRifle, rocketLauncher };
 	[SerializeField]
-	private bool[] unlocked;
+	private bool[] unlocked = new bool[weaponCount] { true, false, false, false, false };
 	[SerializeField]
-	private float[] ammo;
+	private int[] ammo = new int[weaponCount] { 1, 0, 0, 0, 0 };
 	[SerializeField]
-	private float[] reserveAmmo;
+	private int[] reserveAmmo = new int[weaponCount] {0,0,0,0,0};
 	[SerializeField]
-	private float[] magasinSize;
+	private int[] magasinSize = new int[weaponCount] { 12, 30, 7, 30, 3 };
 	[SerializeField]
-	private float[] reloadTime;
+	private float[] reloadTime = new float[weaponCount] { 1, 1, 2, 2, 4 };
 	[SerializeField]
-	private float[] timeBetweenShots;
+	private float[] timeBetweenShots = new float[weaponCount] { 0.5f, 0.05f, 1.5f, 0.15f, 5f };
 	[SerializeField]
-	private KeyCode[] WeaponKeys;
-	[SerializeField]
-	private int weaponCount;
+	private KeyCode[] weaponKeys = new KeyCode[weaponCount] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5 };
+
 	[SerializeField]
 	private float changeWeaponTime = 3f;
 	private bool changingWeapon = false;
@@ -38,16 +38,6 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	private void Start()
 	{
-		unlocked = new bool[weaponCount];
-		unlocked[0] = true;
-
-		ammo = new float[weaponCount];
-		reloadTime = new float[weaponCount];
-		timeBetweenShots = new float[weaponCount];
-		reserveAmmo = new float[weaponCount];
-		magasinSize = new float[weaponCount];
-		WeaponKeys = new KeyCode[weaponCount];
-
 		currentWeapon = 0;
 		shootCooldown = false;
 
@@ -72,23 +62,19 @@ public class PlayerWeaponBehavior : MonoBehaviour
 				StartCoroutine(Shoot());
 			}
 
+			if (Input.GetKeyDown(KeyCode.Alpha9))
+			{
+				ResetVals();
+			}
+
 			if (!changingWeapon)
 			{
-				if (Input.GetKeyDown(KeyCode.Alpha1) && unlocked[0])
+				for (int i = 0; i < weaponKeys.Length; i++)
 				{
-					StartCoroutine(ChangeWeapon(0));
-				}
-				else if (Input.GetKeyDown(KeyCode.Alpha2) && unlocked[1])
-				{
-					StartCoroutine(ChangeWeapon(1));
-				}
-				else if (Input.GetKeyDown(KeyCode.Alpha3) && unlocked[2])
-				{
-					StartCoroutine(ChangeWeapon(2));
-				}
-				else if (Input.GetKeyDown(KeyCode.Alpha4) && unlocked[3])
-				{
-					StartCoroutine(ChangeWeapon(3));
+					if (Input.GetKeyDown(weaponKeys[i]) && unlocked[i])
+					{
+						StartCoroutine(ChangeWeapon(i));
+					}
 				}
 			}
 		}
@@ -107,6 +93,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	IEnumerator Shoot()
 	{
+		Debug.Log("Shoot");
 		shootCooldown = true;
 		if (currentWeapon != 0)
 		{
@@ -114,12 +101,36 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		}
 		yield return new WaitForSeconds(timeBetweenShots[currentWeapon]);
 		shootCooldown = false;
-		Debug.Log("Shoot");
 	}
 
 	IEnumerator Reload()
 	{
 		yield return new WaitForSeconds(reloadTime[currentWeapon]);
 		Debug.Log("Reload");
+	}
+
+	private void ResetVals()
+	{
+		unlocked = new bool[weaponCount] { true, false, false, false, false };
+		ammo = new int[weaponCount] { 1, 0, 0, 0, 0 };
+		reloadTime = new float[weaponCount] { 1, 1, 2, 2, 4 };
+		timeBetweenShots = new float[weaponCount] { 0.5f, 0.05f, 1.5f, 0.15f, 5f }; ;
+		reserveAmmo = new int[weaponCount] { 0, 0, 0, 0, 0 }; ;
+		magasinSize = new int[weaponCount] { 12, 30, 7, 30, 3 };
+		weaponKeys = new KeyCode[weaponCount] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5 };
+	}
+
+	private void DissArm(object e)
+	{
+		StartCoroutine(ReArm((float)e));
+	}
+
+	IEnumerator ReArm(float time)
+	{
+		shootCooldown = true;
+		changingWeapon = true;
+		yield return new WaitForSeconds(time);
+		shootCooldown = false;
+		changingWeapon = false;
 	}
 }
