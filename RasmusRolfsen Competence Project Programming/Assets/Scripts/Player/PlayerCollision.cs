@@ -22,8 +22,29 @@ public class PlayerCollision : MonoBehaviour
 		}
 	}
 
+	private void OnCollisionEnter(Collision collission)
+	{
+
+		switch (collission.gameObject.tag)
+		{
+			case "Ground":
+				GroundCollision(collission);
+				break;
+		}
+	}
+
 
 	private void OnTriggerStay(Collider other)
+	{
+		switch (other.gameObject.tag)
+		{
+			case "Enemy":
+				EnemyCollision(other);
+				break;
+		}
+	}
+
+	private void OnTriggerEnter(Collider other)
 	{
 		switch (other.gameObject.tag)
 		{

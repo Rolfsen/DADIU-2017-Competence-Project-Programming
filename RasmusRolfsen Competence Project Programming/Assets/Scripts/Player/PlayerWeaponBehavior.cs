@@ -15,13 +15,15 @@ public struct Weapons
 
 public class PlayerWeaponBehavior : MonoBehaviour
 {
+	// WeaponsCount
 	private const int WeaponCount = 5;
 
+	// move to struct.
 	[SerializeField]
 	private Weapons[] PlayerWeapons = new Weapons[WeaponCount];
 	[SerializeField]
 	private KeyCode[] weaponKeys = new KeyCode[WeaponCount] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5 };
-	[SerializeField]
+	[SerializeField] // Unlocked Flags
 	private bool[] unlocked = new bool[WeaponCount];
 
 	[SerializeField]
@@ -29,7 +31,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	[SerializeField]
 	private float shotDist = 1000;
 
-
+	// rename name + currentWeaponIndex + isCooldown?
 	private bool changingWeapon = false;
 	private int currentWeapon = 0;
 	private bool shootCooldown = false;
@@ -40,29 +42,27 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	{
 		EventManager.StartListening("WeaponUnlock", UnlockWeapon);
 
-		Weapons Gun = new Weapons();
-		Gun.ammo = 5;
-		Debug.Log(Gun.ammo);
 		currentWeapon = 0;
 		shootCooldown = false;
 		changingWeapon = false;
+
 	}
 
 
-	private void UnlockWeapon(object e)
+	private void UnlockWeapon(object weaponIndex)
 	{
-		unlocked[(int)e] = true;
+		unlocked[(int)weaponIndex] = true;
 	}
-	private void LockWeapon(object e)
+	private void LockWeapon(object weaponIndex)
 	{
-		unlocked[(int)e] = false;
+		unlocked[(int)weaponIndex] = false;
 	}
 
 	private void Update()
 	{
 		if (Input.anyKey)
 		{
-			if (Input.GetMouseButton(1) && PlayerWeapons[currentWeapon].ammo != 0 && !shootCooldown)
+			if (Input.GetMouseButton(0) && PlayerWeapons[currentWeapon].ammo > 0 && !shootCooldown)
 			{
 				StartCoroutine(Shoot());
 			}
@@ -74,13 +74,18 @@ public class PlayerWeaponBehavior : MonoBehaviour
 					if (Input.GetKeyDown(weaponKeys[i]) && unlocked[i])
 					{
 						StartCoroutine(ChangeWeapon(i));
+						break;
 					}
 				}
 			}
 		}
 	}
+
 	private void DissArm(object e)
 	{
+		// sets cooldowns
+		shootCooldown = true;
+		changingWeapon = true;
 		StartCoroutine(ReArm((float)e));
 	}
 
@@ -123,8 +128,6 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	IEnumerator ReArm(float time)
 	{
-		shootCooldown = true;
-		changingWeapon = true;
 		yield return new WaitForSeconds(time);
 		shootCooldown = false;
 		changingWeapon = false;

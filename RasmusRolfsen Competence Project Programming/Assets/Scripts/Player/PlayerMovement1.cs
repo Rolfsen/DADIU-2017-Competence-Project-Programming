@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement1 : MonoBehaviour
 {
-	
+	// jumping state specify and falling
 	public enum PlayerState { idle, running, jumping, blocking, dashing, falling };
 	public enum MovementDir { left, right, none };
 	[SerializeField]
@@ -67,6 +67,9 @@ public class PlayerMovement1 : MonoBehaviour
 		{
 			Falling();
 		}
+		else
+			Debug.Assert(false);
+		// Insert debug message
 
 		floorCol = false;
 	}
@@ -83,7 +86,7 @@ public class PlayerMovement1 : MonoBehaviour
 	// Functions that handle players states and execute player movement
 	private void Idle()
 	{
-		AnyStateActions();
+		
 		if (Input.GetKey(moveLeft) || Input.GetKey(moveRight))
 		{
 			if (Input.GetKey(moveLeft))
@@ -95,12 +98,16 @@ public class PlayerMovement1 : MonoBehaviour
 				currentDir = MovementDir.right;
 			}
 			currentState = PlayerState.running;
+			return;
 		}
+
 		if (Input.GetKeyDown(jumpKey))
 		{
 			Jump(jumpPower);
 			currentState = PlayerState.jumping;
+			return;
 		}
+		AnyStateActions();
 	}
 
 	private void Running()
@@ -119,11 +126,11 @@ public class PlayerMovement1 : MonoBehaviour
 
 		if (Input.GetKeyDown(jumpKey))
 		{
-			Jump(jumpPower);
 			currentState = PlayerState.jumping;
+			Jump(jumpPower);
 		}
 	}
-
+	// MidAirJumping
 	private void Jumping()
 	{
 		if (rb.velocity.y == 0 && floorCol)
@@ -164,8 +171,10 @@ public class PlayerMovement1 : MonoBehaviour
 
 	private void Falling()
 	{
-		if (rb.velocity.y == 0)
+		if (rb.velocity.y >= 0)
 		{
+			//rb.velocity = (rb.velocity.x, 0, rb.velocity.z);
+			//rb.velocity.y = 0;
 			currentState = PlayerState.idle;
 		}
 	}
