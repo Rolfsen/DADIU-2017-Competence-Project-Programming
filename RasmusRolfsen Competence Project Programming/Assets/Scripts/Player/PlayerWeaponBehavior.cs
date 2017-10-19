@@ -11,6 +11,8 @@ public struct Weapons
 	public int magasinSize;
 	public float reloadTime;
 	public float attackSpeed;
+	public bool isUnlocked;
+	public KeyCode changeWeaponKey;
 }
 
 public class PlayerWeaponBehavior : MonoBehaviour
@@ -21,10 +23,10 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	// move to struct.
 	[SerializeField]
 	private Weapons[] PlayerWeapons = new Weapons[WeaponCount];
-	[SerializeField]
+	/*[SerializeField]
 	private KeyCode[] weaponKeys = new KeyCode[WeaponCount] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5 };
 	[SerializeField] // Unlocked Flags
-	private bool[] unlocked = new bool[WeaponCount];
+	private bool[] unlocked = new bool[WeaponCount];*/
 
 	[SerializeField]
 	private float changeWeaponTime = 3f;
@@ -33,8 +35,8 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	// rename name + currentWeaponIndex + isCooldown?
 	private bool changingWeapon = false;
-	private int currentWeapon = 0;
-	private bool shootCooldown = false;
+	private int currentWeaponIndex = 0;
+	private bool isShootCooldown = false;
 
 
 
@@ -42,8 +44,8 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	{
 		EventManager.StartListening("WeaponUnlock", UnlockWeapon);
 
-		currentWeapon = 0;
-		shootCooldown = false;
+		currentWeaponIndex = 0;
+		isShootCooldown = false;
 		changingWeapon = false;
 
 	}
@@ -51,40 +53,40 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	private void UnlockWeapon(object weaponIndex)
 	{
-		unlocked[(int)weaponIndex] = true;
+		PlayerWeapons[currentWeaponIndex].isUnlocked = true;
 	}
 	private void LockWeapon(object weaponIndex)
 	{
-		unlocked[(int)weaponIndex] = false;
+		PlayerWeapons[currentWeaponIndex].isUnlocked = false;
 	}
 
 	private void Update()
 	{
 		if (Input.anyKey)
 		{
-			if (Input.GetMouseButton(0) && PlayerWeapons[currentWeapon].ammo > 0 && !shootCooldown)
+			if (Input.GetMouseButton(0) && PlayerWeapons[currentWeaponIndex].ammo > 0 && !isShootCooldown)
 			{
 				StartCoroutine(Shoot());
 			}
 
 			if (!changingWeapon)
 			{
-				for (int i = 0; i < weaponKeys.Length; i++)
+				for (int i = 0; i < PlayerWeapons.Length; i++)
 				{
-					if (Input.GetKeyDown(weaponKeys[i]) && unlocked[i])
+					if (Input.GetKeyDown(PlayerWeapons[i].changeWeaponKey) && PlayerWeapons[i].isUnlocked)
 					{
 						StartCoroutine(ChangeWeapon(i));
 						break;
 					}
 				}
 			}
-		}
+		} 
 	}
 
 	private void DissArm(object e)
 	{
 		// sets cooldowns
-		shootCooldown = true;
+		isShootCooldown = true;
 		changingWeapon = true;
 		StartCoroutine(ReArm((float)e));
 	}
@@ -92,10 +94,10 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	IEnumerator ChangeWeapon(int newWeapon)
 	{
 		changingWeapon = true;
-		shootCooldown = true;
+		isShootCooldown = true;
 		yield return new WaitForSeconds(changeWeaponTime);
-		currentWeapon = newWeapon;
-		shootCooldown = false;
+		currentWeaponIndex = newWeapon;
+		isShootCooldown = false;
 		changingWeapon = false;
 		Debug.Log("ChangeWeapon");
 	}
@@ -111,25 +113,25 @@ public class PlayerWeaponBehavior : MonoBehaviour
 			Debug.Log(hit.transform.gameObject);
 		}
 		Debug.Log("Shoot");
-		shootCooldown = true;
-		if (currentWeapon != 0)
+		isShootCooldown = true;
+		if (currentWeaponIndex != 0)
 		{
-			PlayerWeapons[currentWeapon].ammo--;
+			PlayerWeapons[currentWeaponIndex].ammo--;
 		}
-		yield return new WaitForSeconds(PlayerWeapons[currentWeapon].attackSpeed);
-		shootCooldown = false;
+		yield return new WaitForSeconds(PlayerWeapons[currentWeaponIndex].attackSpeed);
+		isShootCooldown = false;
 	}
 
 	IEnumerator Reload()
 	{
-		yield return new WaitForSeconds(PlayerWeapons[currentWeapon].reloadTime);
+		yield return new WaitForSeconds(PlayerWeapons[currentWeaponIndex].reloadTime);
 		Debug.Log("Reload");
 	}
 
 	IEnumerator ReArm(float time)
 	{
 		yield return new WaitForSeconds(time);
-		shootCooldown = false;
+		isShootCooldown = false;
 		changingWeapon = false;
 	}
 }
