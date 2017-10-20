@@ -39,7 +39,7 @@ public class PlayerMovement1 : MonoBehaviour
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
-		EventManager.StartListening("GroundCollision", GroundCol);
+		EventManager.StartListening("GroundCollision1", GroundCol);
 		blockReady = true;
 	}
 
@@ -236,6 +236,7 @@ public class PlayerMovement1 : MonoBehaviour
 
 	private void GroundCol (object e)
 	{
+		Debug.Log("Smash");
 		floorCol = true;
 	}
 }

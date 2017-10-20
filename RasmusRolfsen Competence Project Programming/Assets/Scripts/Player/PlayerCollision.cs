@@ -33,7 +33,6 @@ public class PlayerCollision : MonoBehaviour
 		}
 	}
 
-
 	private void OnTriggerStay(Collider other)
 	{
 		switch (other.gameObject.tag)
@@ -44,21 +43,12 @@ public class PlayerCollision : MonoBehaviour
 		}
 	}
 
-	private void OnTriggerEnter(Collider other)
-	{
-		switch (other.gameObject.tag)
-		{
-			case "Enemy":
-				EnemyCollision(other);
-				break;
-		}
-	}
 
 	private void GroundCollision(Collision collission)
 	{
 		bool check = false;
 
-		if (GetComponent<PlayerMovement1>().currentState == PlayerMovement1.PlayerState.jumping)
+		if (GetComponent<PlayerMovementTest>().currentState == PlayerMovementTest.PlayerState.airMovement)
 		{
 			foreach (ContactPoint contact in collission.contacts)
 			{
@@ -72,6 +62,7 @@ public class PlayerCollision : MonoBehaviour
 			}
 			if (check == true)
 			{
+
 				EventManager.TriggerEvent("GroundCollision", null);
 			}
 		}
