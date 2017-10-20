@@ -193,6 +193,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 			else
 			{
 				PlayerWeapons[currentWeaponIndex].ammo = PlayerWeapons[currentWeaponIndex].reserveAmmo;
+				PlayerWeapons[currentWeaponIndex].reserveAmmo = 0;
 			}
 		}
 		else
