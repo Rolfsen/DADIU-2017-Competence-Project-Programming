@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovementTest : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
 	// jumping state specify and falling
 	public enum PlayerState { idle, running, airMovement, blocking, dashing, afterBlock };
@@ -32,7 +32,7 @@ public class PlayerMovementTest : MonoBehaviour
 
 	private bool blockReady = true;
 	private bool isJumpKeyPressed = false;
-	private bool doubleJump = false;
+	private bool haveDoubleJumped = false;
 	private bool floorCol = false;
 	private bool startBlock = false;
 
@@ -45,6 +45,7 @@ public class PlayerMovementTest : MonoBehaviour
 		blockReady = true;
 		isJumpKeyPressed = false;
 		startBlock = false;
+		floorCol = false;
 
 	}
 
@@ -73,20 +74,22 @@ public class PlayerMovementTest : MonoBehaviour
 				Debug.Assert(false);
 				break;
 		}
-		floorCol = false;
+
 	}
 
 	private void FixedUpdate()
 	{
 		if (startBlock)
 		{
-			currentState = PlayerState.blocking;
 			startBlock = false;
+			currentState = PlayerState.blocking;
+			EventManager.TriggerEvent("PlayerBlockState", true);
 			StartCoroutine(BlockTimer());
 		}
 
 		else if (currentState == PlayerState.blocking)
 		{
+			
 			rb.velocity = Vector3.zero;
 		} 
 		else
@@ -131,13 +134,12 @@ public class PlayerMovementTest : MonoBehaviour
 			isJumpKeyPressed = true;
 			return;
 		}
+
 		AnyStateActions();
 	}
 
 	private void RunningStateHandler()
 	{
-
-
 		if (Input.GetKey(moveRight) == false && currentDir == MovementDir.right)
 		{
 			currentState = PlayerState.idle;
@@ -156,22 +158,23 @@ public class PlayerMovementTest : MonoBehaviour
 		}
 		AnyStateActions();
 	}
-	// MidAirJumping
+
 	private void InAirStateHandler()
 	{
 		if (rb.velocity.y == 0 && floorCol)
 		{
-			doubleJump = false;
+			haveDoubleJumped = false;
 			currentState = PlayerState.idle;
-			Debug.Log("Jump Over");
+			floorCol = false;
 			return;
 		}
 
-		if (Input.GetKeyDown(jumpKey) && doubleJump == false)
+		if (Input.GetKeyDown(jumpKey) && haveDoubleJumped == false)
 		{
 			isJumpKeyPressed = true;
-			doubleJump = true;
+			haveDoubleJumped = true;
 		}
+
 		AnyStateActions();
 
 		if (Input.GetKey(moveLeft))
@@ -197,12 +200,21 @@ public class PlayerMovementTest : MonoBehaviour
 	{
 		if (rb.velocity.y >= 0)
 		{
+			haveDoubleJumped = false;
 			currentState = PlayerState.idle;
 		}
 	}
 
+	private void BlockingStateHandler()
+	{
+		
+		if (Input.GetKeyUp(blockKey))
+		{
+			BlockDone();
+		}
+	}
 
-	// Functions that control player movement
+	// Functions that control player movement and actions in states
 	private void AnyStateActions()
 	{
 		if (Input.GetKey(blockKey) && blockReady)
@@ -216,20 +228,16 @@ public class PlayerMovementTest : MonoBehaviour
 		if (currentDir == MovementDir.left)
 		{
 			rb.MovePosition(transform.position + -transform.right * movementSpeed * Time.deltaTime);
+			return;
 		}
+
 		if (currentDir == MovementDir.right)
 		{
 			rb.MovePosition(transform.position + transform.right * movementSpeed * Time.deltaTime);
+			return;
 		}
 	}
-	private void BlockingStateHandler()
-	{
-		
-		if (Input.GetKeyUp(blockKey))
-		{
-			BlockDone();
-		}
-	}
+
 
 	public void Jump(float jumpStrength)
 	{
@@ -239,9 +247,20 @@ public class PlayerMovementTest : MonoBehaviour
 
 	void BlockDone()
 	{
+		EventManager.TriggerEvent("PlayerBlockState",false);
 		blockReady = false;
 		StartCoroutine(BlockCooldown());
 		currentState = PlayerState.afterBlock;
+	}
+
+	private void GroundCol(object e)
+	{
+		floorCol = true;
+	}
+
+	public void RayCastDir (Vector3 dir)
+	{
+		Ray horizontalRay = new Ray(transform.position,dir);
 	}
 
 	IEnumerator BlockTimer()
@@ -255,9 +274,5 @@ public class PlayerMovementTest : MonoBehaviour
 		blockReady = true;
 	}
 
-	private void GroundCol(object e)
-	{
-		Debug.Log("Smash ");
-		floorCol = true;
-	}
+
 }

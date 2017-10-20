@@ -24,7 +24,6 @@ public class PlayerCollision : MonoBehaviour
 
 	private void OnCollisionEnter(Collision collission)
 	{
-
 		switch (collission.gameObject.tag)
 		{
 			case "Ground":
@@ -46,9 +45,7 @@ public class PlayerCollision : MonoBehaviour
 
 	private void GroundCollision(Collision collission)
 	{
-		bool check = false;
-
-		if (GetComponent<PlayerMovementTest>().currentState == PlayerMovementTest.PlayerState.airMovement)
+		if (GetComponent<PlayerMovement>().currentState == PlayerMovement.PlayerState.airMovement)
 		{
 			foreach (ContactPoint contact in collission.contacts)
 			{
@@ -56,14 +53,9 @@ public class PlayerCollision : MonoBehaviour
 
 				if (dir.y > thresholdMin && dir.y < thresholdMax)
 				{
-					check = true;
+					EventManager.TriggerEvent("GroundCollision", null);
 					break;
 				}
-			}
-			if (check == true)
-			{
-
-				EventManager.TriggerEvent("GroundCollision", null);
 			}
 		}
 	}

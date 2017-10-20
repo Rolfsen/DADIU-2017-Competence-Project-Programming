@@ -9,6 +9,7 @@ public struct Weapons
 	public int ammo;
 	public int reserveAmmo;
 	public int magasinSize;
+	public int weaponDamage;
 	public float reloadTime;
 	public float attackSpeed;
 	public bool isUnlocked;
@@ -23,10 +24,6 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	// move to struct.
 	[SerializeField]
 	private Weapons[] PlayerWeapons = new Weapons[WeaponCount];
-	/*[SerializeField]
-	private KeyCode[] weaponKeys = new KeyCode[WeaponCount] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5 };
-	[SerializeField] // Unlocked Flags
-	private bool[] unlocked = new bool[WeaponCount];*/
 
 	[SerializeField]
 	private float changeWeaponTime = 3f;
@@ -37,17 +34,25 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	private bool changingWeapon = false;
 	private int currentWeaponIndex = 0;
 	private bool isShootCooldown = false;
-
+	private bool isBlocking = false;
+	private LineRenderer line = null;
 
 
 	private void Awake()
 	{
 		EventManager.StartListening("WeaponUnlock", UnlockWeapon);
+		EventManager.StartListening("PlayerBlockState", PlayerBlocking);
 
 		currentWeaponIndex = 0;
 		isShootCooldown = false;
 		changingWeapon = false;
 
+		line = GetComponent<LineRenderer>();
+	}
+
+	private void PlayerBlocking(object blockState)
+	{
+		isBlocking = (bool)blockState;
 	}
 
 
@@ -62,7 +67,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	private void Update()
 	{
-		if (Input.anyKey)
+		if (Input.anyKey && !isBlocking)
 		{
 			if (Input.GetMouseButton(0) && PlayerWeapons[currentWeaponIndex].ammo > 0 && !isShootCooldown)
 			{
@@ -108,11 +113,26 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		Vector3 dir = Input.mousePosition - pScreenPos;
 		Ray ray = new Ray(transform.position, dir);
 		RaycastHit hit;
+
+		line.SetPosition(0, transform.position);
 		if (Physics.Raycast(ray, out hit, shotDist))
 		{
-			Debug.Log(hit.transform.gameObject);
+			switch (hit.transform.gameObject.tag)
+			{
+				case "Enemy":
+					EnemyHit(hit.transform.gameObject);
+					break;
+			}
+			line.SetPosition(1, hit.point);
 		}
-		Debug.Log("Shoot");
+		else
+		{
+			line.SetPosition(1, dir);
+		}
+
+		StartCoroutine(LineLifeTime());
+
+
 		isShootCooldown = true;
 		if (currentWeaponIndex != 0)
 		{
@@ -120,6 +140,18 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		}
 		yield return new WaitForSeconds(PlayerWeapons[currentWeaponIndex].attackSpeed);
 		isShootCooldown = false;
+	}
+
+	private void EnemyHit(GameObject hit)
+	{
+	hit.GetComponent<EnemyHealth>().LoseHealth(PlayerWeapons[currentWeaponIndex].weaponDamage);
+	}
+
+	IEnumerator LineLifeTime()
+	{
+		line.enabled = true;
+		yield return new WaitForSeconds(0.01f);
+		line.enabled = false;
 	}
 
 	IEnumerator Reload()
