@@ -26,6 +26,9 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	private Weapons[] PlayerWeapons = new Weapons[WeaponCount];
 
 	[SerializeField]
+	private KeyCode reloadKey = KeyCode.R;
+
+	[SerializeField]
 	private float changeWeaponTime = 3f;
 	[SerializeField]
 	private float shotDist = 1000;
@@ -35,6 +38,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	private int currentWeaponIndex = 0;
 	private bool isShootCooldown = false;
 	private bool isBlocking = false;
+	private bool isReloading = false;
 	private LineRenderer line = null;
 
 
@@ -46,7 +50,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		currentWeaponIndex = 0;
 		isShootCooldown = false;
 		changingWeapon = false;
-
+		isReloading = false;
 		line = GetComponent<LineRenderer>();
 	}
 
@@ -67,11 +71,20 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	private void Update()
 	{
-		if (Input.anyKey && !isBlocking)
+		if (Input.GetKeyDown(reloadKey))
+		{
+			StartCoroutine(Reload());
+		}
+
+		if (Input.anyKey && !isBlocking && !isReloading)
 		{
 			if (Input.GetMouseButton(0) && PlayerWeapons[currentWeaponIndex].ammo > 0 && !isShootCooldown)
 			{
 				StartCoroutine(Shoot());
+			}
+			else if (Input.GetMouseButton(0) && PlayerWeapons[currentWeaponIndex].ammo < 1 && !isShootCooldown)
+			{
+				StartCoroutine(Reload());
 			}
 
 			if (!changingWeapon)
@@ -85,7 +98,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 					}
 				}
 			}
-		} 
+		}
 	}
 
 	private void DissArm(object e)
@@ -111,6 +124,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	{
 		Vector3 pScreenPos = Camera.main.WorldToScreenPoint(transform.position);
 		Vector3 dir = Input.mousePosition - pScreenPos;
+		dir.z = 0;
 		Ray ray = new Ray(transform.position, dir);
 		RaycastHit hit;
 
@@ -134,17 +148,22 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 
 		isShootCooldown = true;
-		if (currentWeaponIndex != 0)
+		PlayerWeapons[currentWeaponIndex].ammo--;
+		if (PlayerWeapons[currentWeaponIndex].ammo < 1)
 		{
-			PlayerWeapons[currentWeaponIndex].ammo--;
+			StartCoroutine(Reload());
 		}
-		yield return new WaitForSeconds(PlayerWeapons[currentWeaponIndex].attackSpeed);
+		else
+		{
+			yield return new WaitForSeconds(PlayerWeapons[currentWeaponIndex].attackSpeed);
+		}
+
 		isShootCooldown = false;
 	}
 
 	private void EnemyHit(GameObject hit)
 	{
-	hit.GetComponent<EnemyHealth>().LoseHealth(PlayerWeapons[currentWeaponIndex].weaponDamage);
+		hit.GetComponent<EnemyHealth>().LoseHealth(PlayerWeapons[currentWeaponIndex].weaponDamage);
 	}
 
 	IEnumerator LineLifeTime()
@@ -156,7 +175,32 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	IEnumerator Reload()
 	{
+		Debug.Log("Reload Start");
+		isReloading = true;
+		if (currentWeaponIndex != 0)
+		{
+			if (PlayerWeapons[currentWeaponIndex].reserveAmmo < 1)
+			{
+				isReloading = false;
+				StartCoroutine(ChangeWeapon(0));
+				StopCoroutine(Reload());
+			}
+			else if (PlayerWeapons[currentWeaponIndex].reserveAmmo >= PlayerWeapons[currentWeaponIndex].magasinSize)
+			{
+				PlayerWeapons[currentWeaponIndex].ammo = PlayerWeapons[currentWeaponIndex].magasinSize;
+				PlayerWeapons[currentWeaponIndex].reserveAmmo -= PlayerWeapons[currentWeaponIndex].magasinSize;
+			}
+			else
+			{
+				PlayerWeapons[currentWeaponIndex].ammo = PlayerWeapons[currentWeaponIndex].reserveAmmo;
+			}
+		}
+		else
+		{
+			PlayerWeapons[currentWeaponIndex].ammo = PlayerWeapons[currentWeaponIndex].magasinSize;
+		}
 		yield return new WaitForSeconds(PlayerWeapons[currentWeaponIndex].reloadTime);
+		isReloading = false;
 		Debug.Log("Reload");
 	}
 
