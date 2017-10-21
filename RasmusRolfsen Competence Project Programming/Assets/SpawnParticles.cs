@@ -33,7 +33,7 @@ public class SpawnParticles : MonoBehaviour
 
 	IEnumerator DestroyParticle (GameObject particle)
 	{
-		yield return new WaitForSeconds(0.2f);
+		yield return new WaitForSeconds(0.3f);
 		Destroy(particle);
 	}
 }
