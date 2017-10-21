@@ -52,13 +52,13 @@ public class PlayerWeaponBehaviorOLD : MonoBehaviour
 		changingWeapon = false;
 	}
 
-	private void UnlockWeapon(object e)
+	private void UnlockWeapon(object weaponToUnlock, object none)
 	{
-		unlocked[(int)e] = true;
+		unlocked[(int)weaponToUnlock] = true;
 	}
-	private void LockWeapon(object e)
+	private void LockWeapon(object weaponTolock)
 	{
-		unlocked[(int)e] = false;
+		unlocked[(int)weaponTolock] = false;
 	}
 
 	private void Update()

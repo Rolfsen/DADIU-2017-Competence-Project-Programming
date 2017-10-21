@@ -83,7 +83,7 @@ public class PlayerMovement : MonoBehaviour
 		{
 			startBlock = false;
 			currentState = PlayerState.blocking;
-			EventManager.TriggerEvent("PlayerBlockState", true);
+			EventManager.TriggerEvent("PlayerBlockState", true, null);
 			StartCoroutine(BlockTimer());
 		}
 
@@ -247,21 +247,18 @@ public class PlayerMovement : MonoBehaviour
 
 	void BlockDone()
 	{
-		EventManager.TriggerEvent("PlayerBlockState",false);
+		EventManager.TriggerEvent("PlayerBlockState",false,null);
 		blockReady = false;
 		StartCoroutine(BlockCooldown());
 		currentState = PlayerState.afterBlock;
 	}
 
-	private void GroundCol(object e)
+	private void GroundCol(object e, object e2)
 	{
 		floorCol = true;
 	}
 
-	public void RayCastDir (Vector3 dir)
-	{
-		Ray horizontalRay = new Ray(transform.position,dir);
-	}
+
 
 	IEnumerator BlockTimer()
 	{

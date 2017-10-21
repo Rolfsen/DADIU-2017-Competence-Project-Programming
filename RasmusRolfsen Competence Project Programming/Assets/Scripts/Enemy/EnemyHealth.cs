@@ -15,18 +15,16 @@ public class EnemyHealth : MonoBehaviour {
 	private int killScore = 40;
 	private int currentHealth = 100;
 
-	private ParticleSystem blood = null;
 
 	// Use this for initialization
 	void Awake () {
 		currentHealth = maxHealth;
-		blood = GetComponent<ParticleSystem>();
-		blood.Stop();
+
 	}
 
 	public void LoseHealth (int amount)
 	{
-		blood.Emit(particleAmount);
+		EventManager.TriggerEvent("SpawnBlood", transform.position, 50);
 		currentHealth -= amount;
 		if (currentHealth <= 0)
 		{
@@ -41,7 +39,7 @@ public class EnemyHealth : MonoBehaviour {
 
 	private void OnDestroy()
 	{
-		EventManager.TriggerEvent("SpawnBlood", transform.position);
-		EventManager.TriggerEvent("ScoreChange", killScore);
+		EventManager.TriggerEvent("SpawnBlood", transform.position, 50);
+		EventManager.TriggerEvent("ScoreChange", killScore,false);
 	}
 }

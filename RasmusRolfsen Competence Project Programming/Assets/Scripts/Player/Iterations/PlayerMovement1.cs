@@ -234,9 +234,8 @@ public class PlayerMovement1 : MonoBehaviour
 		blockReady = true;
 	}
 
-	private void GroundCol (object e)
+	private void GroundCol (object e, object e2)
 	{
-		Debug.Log("Smash");
 		floorCol = true;
 	}
 }

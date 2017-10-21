@@ -6,14 +6,16 @@ public class EventExampleTrigger : MonoBehaviour
 {
 
 	[SerializeField]
-	private GameObject message;
+	private string message;
 
-	
+	[SerializeField]
+	private int swag;
+
 	void Update()
 	{
 		if (Input.GetKeyDown(KeyCode.A))
 		{
-			EventManager.TriggerEvent("DebugEvent", message);
+			EventManager.TriggerEvent("DebugEvent", message, swag);
 		}
 	}
 }

@@ -44,7 +44,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	private void Awake()
 	{
-		EventManager.StartListening("WeaponUnlock", UnlockWeapon);
+		EventManager.StartListening("WeaponUnlock", WeaponLockState);
 		EventManager.StartListening("PlayerBlockState", PlayerBlocking);
 
 		currentWeaponIndex = 0;
@@ -54,19 +54,23 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		line = GetComponent<LineRenderer>();
 	}
 
-	private void PlayerBlocking(object blockState)
+	private void PlayerBlocking(object blockState, object none)
 	{
 		isBlocking = (bool)blockState;
 	}
 
 
-	private void UnlockWeapon(object weaponIndex)
+	private void WeaponLockState(object weaponIndex, object newState)
 	{
-		PlayerWeapons[currentWeaponIndex].isUnlocked = true;
-	}
-	private void LockWeapon(object weaponIndex)
-	{
-		PlayerWeapons[currentWeaponIndex].isUnlocked = false;
+		if ((bool)newState)
+		{
+			PlayerWeapons[currentWeaponIndex].isUnlocked = true;
+		}
+		else
+		{
+			PlayerWeapons[currentWeaponIndex].isUnlocked = false;
+		}
+
 	}
 
 	private void Update()
@@ -101,12 +105,12 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		}
 	}
 
-	private void DissArm(object e)
+	private void DisableAttack(object time, object none)
 	{
 		// sets cooldowns
 		isShootCooldown = true;
 		changingWeapon = true;
-		StartCoroutine(ReArm((float)e));
+		StartCoroutine(EnableAttack((float)time));
 	}
 
 	IEnumerator ChangeWeapon(int newWeapon)
@@ -117,7 +121,6 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		currentWeaponIndex = newWeapon;
 		isShootCooldown = false;
 		changingWeapon = false;
-		Debug.Log("ChangeWeapon");
 	}
 
 	IEnumerator Shoot()
@@ -175,7 +178,6 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	IEnumerator Reload()
 	{
-		Debug.Log("Reload Start");
 		isReloading = true;
 		if (currentWeaponIndex != 0)
 		{
@@ -202,10 +204,9 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		}
 		yield return new WaitForSeconds(PlayerWeapons[currentWeaponIndex].reloadTime);
 		isReloading = false;
-		Debug.Log("Reload");
 	}
 
-	IEnumerator ReArm(float time)
+	IEnumerator EnableAttack(float time)
 	{
 		yield return new WaitForSeconds(time);
 		isShootCooldown = false;

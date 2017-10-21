@@ -53,7 +53,7 @@ public class PlayerCollision : MonoBehaviour
 
 				if (dir.y > thresholdMin && dir.y < thresholdMax)
 				{
-					EventManager.TriggerEvent("GroundCollision", null);
+					EventManager.TriggerEvent("GroundCollision", null, null);
 					break;
 				}
 			}
