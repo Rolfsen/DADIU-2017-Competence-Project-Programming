@@ -139,6 +139,9 @@ public class PlayerWeaponBehavior : MonoBehaviour
 				case "Enemy":
 					EnemyHit(hit.transform.gameObject);
 					break;
+				case "Ground":
+					GroundHit(hit);
+					break;
 			}
 			line.SetPosition(1, hit.point);
 		}
@@ -167,6 +170,11 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	private void EnemyHit(GameObject hit)
 	{
 		hit.GetComponent<EnemyHealth>().LoseHealth(PlayerWeapons[currentWeaponIndex].weaponDamage);
+	}
+
+	private void GroundHit(RaycastHit hit)
+	{
+		EventManager.TriggerEvent("SpawnDust", hit.point, 15);
 	}
 
 	IEnumerator LineLifeTime()

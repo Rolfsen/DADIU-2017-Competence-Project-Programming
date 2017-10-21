@@ -34,12 +34,7 @@ public class EnemyHealth : MonoBehaviour {
 
 	private void Dead()
 	{
-		Destroy(gameObject);
-	}
-
-	private void OnDestroy()
-	{
-		EventManager.TriggerEvent("SpawnBlood", transform.position, particleAmount);
 		EventManager.TriggerEvent("ScoreChange", killScore,false);
+		Destroy(gameObject);
 	}
 }
