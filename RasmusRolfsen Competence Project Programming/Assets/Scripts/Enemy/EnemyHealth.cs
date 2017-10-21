@@ -24,7 +24,7 @@ public class EnemyHealth : MonoBehaviour {
 
 	public void LoseHealth (int amount)
 	{
-		EventManager.TriggerEvent("SpawnBlood", transform.position, 50);
+		EventManager.TriggerEvent("SpawnBlood", transform.position, particleAmount);
 		currentHealth -= amount;
 		if (currentHealth <= 0)
 		{
@@ -39,7 +39,7 @@ public class EnemyHealth : MonoBehaviour {
 
 	private void OnDestroy()
 	{
-		EventManager.TriggerEvent("SpawnBlood", transform.position, 50);
+		EventManager.TriggerEvent("SpawnBlood", transform.position, particleAmount);
 		EventManager.TriggerEvent("ScoreChange", killScore,false);
 	}
 }

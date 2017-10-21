@@ -28,12 +28,12 @@ public class SpawnParticles : MonoBehaviour
 		em.enabled = false;
 		bloodEmitter.GetComponent<ParticleSystem>().Emit(particleAmount);
 
-		StartCoroutine(DestroyParticle(bloodEmitter.gameObject));
+		StartCoroutine(DestroyParticle(bloodEmitter.gameObject, bloodEmitter.GetComponent<ParticleSystem>().main.duration));
 	}
 
-	IEnumerator DestroyParticle (GameObject particle)
+	IEnumerator DestroyParticle (GameObject particle, float particleLifetime)
 	{
-		yield return new WaitForSeconds(0.3f);
+		yield return new WaitForSeconds(particleLifetime);
 		Destroy(particle);
 	}
 }
