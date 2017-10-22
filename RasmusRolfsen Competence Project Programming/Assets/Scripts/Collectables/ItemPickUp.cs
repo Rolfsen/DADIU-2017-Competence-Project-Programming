@@ -19,14 +19,8 @@ public class ItemPickUp : MonoBehaviour
 	{
 		if (other.gameObject.tag == "Player")
 		{
-			Debug.Log(other.gameObject.tag);
 			EventManager.TriggerEvent(eventname, variable1, variable2);
 			Destroy(gameObject);
 		}
-	}
-
-	private void Awake()
-	{
-		BoxCollider col = GetComponent<BoxCollider>();
 	}
 }
