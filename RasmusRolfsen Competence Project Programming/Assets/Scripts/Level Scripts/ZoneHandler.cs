@@ -34,7 +34,7 @@ public class ZoneHandler : MonoBehaviour
 	private void SpawnNewZone(object triggerPosition, object none)
 	{
 
-		int nextZone = Random.Range(0, zones.Count-1);
+		int nextZone = Random.Range(0, zones.Count);
 
 		GameObject newZone = zones[nextZone].level;
 
