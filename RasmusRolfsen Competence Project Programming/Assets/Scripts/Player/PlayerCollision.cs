@@ -22,16 +22,6 @@ public class PlayerCollision : MonoBehaviour
 		}
 	}
 
-	private void OnCollisionEnter(Collision collission)
-	{
-		switch (collission.gameObject.tag)
-		{
-			case "Ground":
-				GroundCollision(collission);
-				break;
-		}
-	}
-
 	private void OnTriggerStay(Collider other)
 	{
 		switch (other.gameObject.tag)
@@ -39,8 +29,29 @@ public class PlayerCollision : MonoBehaviour
 			case "Enemy":
 				EnemyCollision(other);
 				break;
+			default:
+				break;
 		}
 	}
+
+	private void OnTriggerEnter(Collider other)
+	{
+		switch (other.gameObject.tag)
+		{
+			case "ZoneSpawner":
+				SpawnZoneCollision(other.transform);
+				break;
+			default:
+				break;
+		}
+	}
+
+	private void SpawnZoneCollision(Transform other)
+	{
+		EventManager.TriggerEvent("SpawnZone", other.transform, null);
+		Destroy(other.gameObject);
+	}
+
 
 
 	private void GroundCollision(Collision collission)
@@ -59,9 +70,10 @@ public class PlayerCollision : MonoBehaviour
 			}
 		}
 	}
+
 	private void EnemyCollision(Collider collider)
 	{
-		Debug.Log("Player Collided with Enemy");
+		EventManager.TriggerEvent("DamagePlayer",5,null);
 	}
 
 }

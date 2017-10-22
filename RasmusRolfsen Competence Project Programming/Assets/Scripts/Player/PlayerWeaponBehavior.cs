@@ -18,10 +18,8 @@ public struct Weapons
 
 public class PlayerWeaponBehavior : MonoBehaviour
 {
-	// WeaponsCount
 	private const int WeaponCount = 5;
 
-	// move to struct.
 	[SerializeField]
 	private Weapons[] PlayerWeapons = new Weapons[WeaponCount];
 
