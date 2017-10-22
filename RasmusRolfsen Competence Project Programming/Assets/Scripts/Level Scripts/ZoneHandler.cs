@@ -38,7 +38,10 @@ public class ZoneHandler : MonoBehaviour
 
 		GameObject newZone = zones[nextZone].level;
 
+		Vector3 spawnPosition = CurrentZones[1].GetComponent<ZoneKeyElements>().levelEnd.transform.position - CurrentZones[0].GetComponent<ZoneKeyElements>().levelStart.transform.localPosition; // change this
+		Quaternion spawnRotation = transform.rotation;
 
+		GameObject spawnedLevel = Instantiate(newZone,spawnPosition,spawnRotation);
 
 
 		CurrentZones.Insert(0, newZone);
@@ -51,10 +54,7 @@ public class ZoneHandler : MonoBehaviour
 			CurrentZones.RemoveAt(1);
 			DestroyImmediate(tmp,true);
 		}
-		Vector3 spawnPosition = CurrentZones[1].GetComponent<ZoneKeyElements>().levelEnd.transform.position - CurrentZones[0].GetComponent<ZoneKeyElements>().levelStart.transform.localPosition; // change this
-		Quaternion spawnRotation = transform.rotation;
 
-		GameObject spawnedLevel = Instantiate(newZone);
 		
 
 	}
