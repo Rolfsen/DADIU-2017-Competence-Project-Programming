@@ -140,7 +140,6 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		line.SetPosition(0, transform.position);
 		if (Physics.Raycast(ray, out hit, shotDist))
 		{
-			Debug.Log(hit.transform.gameObject.name);
 			switch (hit.transform.gameObject.tag)
 			{
 				case "Enemy":
