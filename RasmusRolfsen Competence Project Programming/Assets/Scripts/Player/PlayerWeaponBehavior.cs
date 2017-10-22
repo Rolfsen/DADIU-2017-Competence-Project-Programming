@@ -44,6 +44,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	{
 		EventManager.StartListening("WeaponUnlock", WeaponLockState);
 		EventManager.StartListening("PlayerBlockState", PlayerBlocking);
+		EventManager.StartListening("AddAmmo",GainAmmo);
 
 		currentWeaponIndex = 0;
 		isShootCooldown = false;
@@ -69,6 +70,13 @@ public class PlayerWeaponBehavior : MonoBehaviour
 			PlayerWeapons[currentWeaponIndex].isUnlocked = false;
 		}
 
+	}
+
+	private void GainAmmo (object weaponIndex ,object amount)
+	{
+		int weaponInd = (int)weaponIndex;
+		int addedAmmo = (int)amount;
+		PlayerWeapons[weaponInd].reserveAmmo += addedAmmo;
 	}
 
 	private void Update()
