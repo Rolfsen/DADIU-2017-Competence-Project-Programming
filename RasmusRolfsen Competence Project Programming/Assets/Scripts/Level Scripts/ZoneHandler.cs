@@ -34,25 +34,25 @@ public class ZoneHandler : MonoBehaviour
 	private void SpawnNewZone(object triggerPosition, object none)
 	{
 
-		int nextZone = Random.Range(0, zones.Count);
+		int nextZone = Random.Range(0, zones.Count-1);
 
 		GameObject newZone = zones[nextZone].level;
 
-		Vector3 spawnPosition = CurrentZones[1].GetComponent<ZoneKeyElements>().levelEnd.transform.position - CurrentZones[0].GetComponent<ZoneKeyElements>().levelStart.transform.localPosition; // change this
-		Quaternion spawnRotation = transform.rotation;
+		GameObject spawnedLevel = Instantiate(newZone);
 
-		GameObject spawnedLevel = Instantiate(newZone,spawnPosition,spawnRotation);
+		CurrentZones.Insert(0, spawnedLevel);
 
+		Vector3 spawnPosition = CurrentZones[1].GetComponent<ZoneKeyElements>().levelEnd.transform.position - CurrentZones[0].GetComponent<ZoneKeyElements>().levelStart.transform.localPosition; 
 
-		CurrentZones.Insert(0, newZone);
+		spawnedLevel.transform.position = spawnPosition;
 
 		CurrentZones[1].GetComponent<ZoneKeyElements>().levelBlocker.SetActive(true);
 
 		if (CurrentZones.Count == 3)
 		{
-			var tmp = CurrentZones[1];
-			CurrentZones.RemoveAt(1);
-			DestroyImmediate(tmp,true);
+			var tmp = CurrentZones[2];
+			CurrentZones.RemoveAt(2);
+			Destroy(tmp);
 		}
 
 		
