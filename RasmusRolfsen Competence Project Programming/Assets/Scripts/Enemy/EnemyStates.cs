@@ -22,13 +22,14 @@ public class EnemyStates : MonoBehaviour
 
 	private Transform player;
 
-	private bool isAttackCoold;
+	private bool isAttackReady = true;
 
 	[SerializeField]
-	private List<EnemyAttackTypes> enemyAttacks;
+	private List<EnemyAttackTypes> enemyAttacks = null;
 
 	private void Awake()
 	{
+		isAttackReady = true;
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 	}
 
@@ -58,22 +59,34 @@ public class EnemyStates : MonoBehaviour
 
 	private void AttackBehavior()
 	{
-		Vector3 spawnPosition = transform.position;
-		Quaternion spawnRotation = transform.rotation;
+		if (isAttackReady)
+		{
+			Vector3 spawnPosition = transform.position;
+			Quaternion spawnRotation = transform.rotation;
 
-		int getAttackSeed = Random.Range(0,enemyAttacks.Count-1);
+			int getAttackSeed = Random.Range(0, enemyAttacks.Count);
 
-		GameObject bullet = Instantiate(enemyAttacks[getAttackSeed].bulletType, spawnPosition, spawnRotation);
-		EnemyBulletBehavior bulletBehavior = bullet.GetComponent<EnemyBulletBehavior>();
+			GameObject bullet = Instantiate(enemyAttacks[getAttackSeed].bulletType, spawnPosition, spawnRotation);
+			EnemyBulletBehavior bulletBehavior = bullet.GetComponent<EnemyBulletBehavior>();
 
 
-		bulletBehavior.moveDir = player.transform.position - spawnPosition;
-		bulletBehavior.moveSpeed = enemyAttacks[getAttackSeed].bulletSpeed;
-		bulletBehavior.damage = enemyAttacks[getAttackSeed].damage;
+			bulletBehavior.moveDir = player.transform.position - spawnPosition;
+			bulletBehavior.moveSpeed = enemyAttacks[getAttackSeed].bulletSpeed;
+			bulletBehavior.damage = enemyAttacks[getAttackSeed].damage;
+
+			isAttackReady = false;
+			StartCoroutine(Cooldown(enemyAttacks[getAttackSeed].attackSpeed));
+		}
 	}
 
 	private void NoticeBehavior()
 	{
 		//
+	}
+
+	IEnumerator Cooldown (float cooldownTime)
+	{
+		yield return new WaitForSeconds(cooldownTime);
+		isAttackReady = true;
 	}
 }

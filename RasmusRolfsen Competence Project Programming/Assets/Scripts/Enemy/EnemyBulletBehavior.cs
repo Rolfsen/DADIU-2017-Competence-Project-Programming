@@ -19,11 +19,25 @@ public class EnemyBulletBehavior : MonoBehaviour
 		switch (other.tag)
 		{
 			case ("Player"):
+				PlayerCollision();
 				break;
 			case ("Ground"):
+				DefaulCollision();
 				break;
 			default:
 				break;
 		}
 	}
+
+	void DefaulCollision()
+	{
+		Destroy(gameObject);
+	}
+
+	void PlayerCollision()
+	{
+		EventManager.TriggerEvent("PlayerHealth", -damage,null);
+		DefaulCollision();
+	}
+
 }

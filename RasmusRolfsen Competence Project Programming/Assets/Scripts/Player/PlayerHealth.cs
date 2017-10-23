@@ -14,12 +14,14 @@ public class PlayerHealth : MonoBehaviour {
 
 	private void Awake()
 	{
+		currentHealth = maxHealth;
 		EventManager.StartListening(HealthEvent, ChangeHealth);
 	}
 
 	private void ChangeHealth(object healthChange, object none)
 	{
 		currentHealth += (int) healthChange;
+		Debug.Log(currentHealth);
 		if (currentHealth > maxHealth)
 		{
 			currentHealth = maxHealth;
