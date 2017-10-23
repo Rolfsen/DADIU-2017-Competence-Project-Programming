@@ -8,6 +8,7 @@ public class EnemyBulletBehavior : MonoBehaviour
 	public int damage;
 	public float moveSpeed;
 	public Vector3 moveDir;
+	public List<ParticleEffect> particleEffects;
 
 	[SerializeField]
 	private float lifeTime = 6;
@@ -20,7 +21,7 @@ public class EnemyBulletBehavior : MonoBehaviour
 	private void Update()
 	{
 
-		transform.Translate(moveDir*moveSpeed*Time.deltaTime);
+		transform.Translate(moveDir * moveSpeed * Time.deltaTime);
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -31,7 +32,7 @@ public class EnemyBulletBehavior : MonoBehaviour
 				PlayerCollision();
 				break;
 			case ("Ground"):
-				DefaulCollision();
+				GroundCollision();
 				break;
 			default:
 				break;
@@ -43,25 +44,38 @@ public class EnemyBulletBehavior : MonoBehaviour
 		switch (collision.gameObject.tag)
 		{
 			case ("Ground"):
-				DefaulCollision();
+				GroundCollision();
 				break;
 			default:
 				break;
 		}
 	}
 
-	void DefaulCollision()
+	private void GroundCollision()
+	{
+		if (particleEffects.Count > 1)
+		{
+			EventManager.TriggerEvent(particleEffects[1].eventName,transform.position, particleEffects[1].amountOfParticles);
+		}
+		DefaulCollision();
+	}
+
+	private void DefaulCollision()
 	{
 		Destroy(gameObject);
 	}
 
-	void PlayerCollision()
+	private void PlayerCollision()
 	{
-		EventManager.TriggerEvent("PlayerHealth", -damage,null);
+		EventManager.TriggerEvent("PlayerHealth", -damage, null);
+		if (particleEffects.Count > 0)
+		{
+			EventManager.TriggerEvent(particleEffects[0].eventName, transform.position, particleEffects[0].amountOfParticles);
+		}
 		DefaulCollision();
 	}
 
-	IEnumerator DestroyMe ()
+	IEnumerator DestroyMe()
 	{
 		yield return new WaitForSeconds(lifeTime);
 		Destroy(gameObject);

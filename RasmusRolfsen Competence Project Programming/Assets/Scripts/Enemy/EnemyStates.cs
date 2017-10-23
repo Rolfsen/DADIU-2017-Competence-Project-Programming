@@ -10,12 +10,20 @@ public struct EnemyAttackTypes
 	public int damage;
 	public GameObject bulletType;
 	public Color bulletColor;
+	public List<ParticleEffect> particleEffect;
+}
+
+[System.Serializable]
+public struct ParticleEffect
+{
+	public string eventName;
+	public int amountOfParticles;
 }
 
 public class EnemyStates : MonoBehaviour
 {
 
-	public Color[] unitColors = new Color[3]; 
+	public Color[] unitColors = new Color[3];
 
 	public enum enemyState { idle, patrol, notice, attack, chase, returnToPosition };
 
@@ -78,7 +86,15 @@ public class EnemyStates : MonoBehaviour
 			bulletBehavior.moveDir = player.transform.position - spawnPosition;
 			bulletBehavior.moveSpeed = enemyAttacks[getAttackSeed].bulletSpeed;
 			bulletBehavior.damage = enemyAttacks[getAttackSeed].damage;
+			if (enemyAttacks[getAttackSeed].particleEffect.Count > 0)
+			{
+				for (int i = 0; i < enemyAttacks[getAttackSeed].particleEffect.Count; i++)
+				{
+					bulletBehavior.particleEffects.Add(enemyAttacks[getAttackSeed].particleEffect[i]);
+				}
+			}
 			bullet.GetComponent<Renderer>().material.color = enemyAttacks[getAttackSeed].bulletColor;
+
 
 			isAttackReady = false;
 			StartCoroutine(Cooldown(enemyAttacks[getAttackSeed].attackSpeed));
@@ -90,7 +106,7 @@ public class EnemyStates : MonoBehaviour
 		//
 	}
 
-	IEnumerator Cooldown (float cooldownTime)
+	IEnumerator Cooldown(float cooldownTime)
 	{
 		yield return new WaitForSeconds(cooldownTime);
 		isAttackReady = true;
