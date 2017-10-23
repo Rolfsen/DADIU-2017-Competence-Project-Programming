@@ -9,11 +9,13 @@ public struct EnemyAttackTypes
 	public float bulletSpeed;
 	public int damage;
 	public GameObject bulletType;
+	public Color bulletColor;
 }
 
 public class EnemyStates : MonoBehaviour
 {
 
+	public Color[] unitColors = new Color[3]; 
 
 	public enum enemyState { idle, patrol, notice, attack, chase, returnToPosition };
 
@@ -26,6 +28,8 @@ public class EnemyStates : MonoBehaviour
 
 	[SerializeField]
 	private List<EnemyAttackTypes> enemyAttacks = null;
+
+
 
 	private void Awake()
 	{
@@ -73,6 +77,7 @@ public class EnemyStates : MonoBehaviour
 			bulletBehavior.moveDir = player.transform.position - spawnPosition;
 			bulletBehavior.moveSpeed = enemyAttacks[getAttackSeed].bulletSpeed;
 			bulletBehavior.damage = enemyAttacks[getAttackSeed].damage;
+			bullet.GetComponent<Renderer>().material.color = enemyAttacks[getAttackSeed].bulletColor;
 
 			isAttackReady = false;
 			StartCoroutine(Cooldown(enemyAttacks[getAttackSeed].attackSpeed));

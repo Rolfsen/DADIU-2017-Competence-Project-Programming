@@ -10,7 +10,11 @@ public class ChildTriggers : MonoBehaviour {
 	[SerializeField]
 	EnemyStates.enemyState exitState;
 
+	[SerializeField]
+	private int parentColorIndex;
+
 	EnemyStates parentState;
+	private Color previousColor;
 
 	private void Start()
 	{
@@ -23,12 +27,15 @@ public class ChildTriggers : MonoBehaviour {
 		if (other.tag == "Player")
 		{
 			parentState.objectState = enterState;
+			previousColor = GetComponentInParent<Renderer>().material.color;
+			GetComponentInParent<Renderer>().material.color = GetComponentInParent<EnemyStates>().unitColors[parentColorIndex];
 		}
 	}
 	private void OnTriggerExit(Collider other)
 	{
 		if (other.tag == "Player")
 		{
+			GetComponentInParent<Renderer>().material.color = previousColor;
 			parentState.objectState = exitState;			
 		}
 	}
