@@ -22,14 +22,14 @@ public class ChildTriggers : MonoBehaviour {
 	{
 		if (other.tag == "Player")
 		{
-			parentState.state = enterState;
+			parentState.objectState = enterState;
 		}
 	}
 	private void OnTriggerExit(Collider other)
 	{
 		if (other.tag == "Player")
 		{
-			parentState.state = exitState;			
+			parentState.objectState = exitState;			
 		}
 	}
 }
