@@ -31,6 +31,4 @@ public class PlayerHealth : MonoBehaviour {
 			EventManager.TriggerEvent("PlayerDied",0,0);			
 		}
 	}
-
-
 }

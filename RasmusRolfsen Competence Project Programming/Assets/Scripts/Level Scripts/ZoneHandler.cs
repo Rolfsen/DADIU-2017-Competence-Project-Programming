@@ -12,19 +12,14 @@ public struct SpawnableZones
 
 public class ZoneHandler : MonoBehaviour
 {
-
 	[SerializeField]
-	private List<GameObject> CurrentZones;
-
+	private List<GameObject> CurrentZones = null;
 	[SerializeField]
-	private AnimationCurve increaseDifficulty;
-
+	private AnimationCurve increaseDifficulty = null;
 	[SerializeField]
-	private float startDifficulty;
-
+	private float startDifficulty = 0;
 	[SerializeField]
-	private List<SpawnableZones> zones;
-
+	private List<SpawnableZones> zones = null;
 
 	private void Awake()
 	{
@@ -33,29 +28,18 @@ public class ZoneHandler : MonoBehaviour
 
 	private void SpawnNewZone(object triggerPosition, object none)
 	{
-
 		int nextZone = Random.Range(0, zones.Count);
-
 		GameObject newZone = zones[nextZone].level;
-
 		GameObject spawnedLevel = Instantiate(newZone);
-
 		CurrentZones.Insert(0, spawnedLevel);
-
 		Vector3 spawnPosition = CurrentZones[1].GetComponent<ZoneKeyElements>().levelEnd.transform.position - CurrentZones[0].GetComponent<ZoneKeyElements>().levelStart.transform.localPosition; 
-
 		spawnedLevel.transform.position = spawnPosition;
-
 		CurrentZones[1].GetComponent<ZoneKeyElements>().levelBlocker.SetActive(true);
-
 		if (CurrentZones.Count == 3)
 		{
 			var tmp = CurrentZones[2];
 			CurrentZones.RemoveAt(2);
 			Destroy(tmp);
 		}
-
-		
-
 	}
 }

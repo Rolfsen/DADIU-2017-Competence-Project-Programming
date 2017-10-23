@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour {
-
-
-
-
 	[SerializeField]
 	private int particleAmount = 50;
 	[SerializeField]

@@ -9,8 +9,17 @@ public class EnemyBulletBehavior : MonoBehaviour
 	public float moveSpeed;
 	public Vector3 moveDir;
 
+	[SerializeField]
+	private float lifeTime = 6;
+
+	private void Start()
+	{
+		StartCoroutine(DestroyMe());
+	}
+
 	private void Update()
 	{
+
 		transform.Translate(moveDir*moveSpeed*Time.deltaTime);
 	}
 
@@ -21,6 +30,18 @@ public class EnemyBulletBehavior : MonoBehaviour
 			case ("Player"):
 				PlayerCollision();
 				break;
+			case ("Ground"):
+				DefaulCollision();
+				break;
+			default:
+				break;
+		}
+	}
+
+	private void OnCollisionEnter(Collision collision)
+	{
+		switch (collision.gameObject.tag)
+		{
 			case ("Ground"):
 				DefaulCollision();
 				break;
@@ -40,4 +61,9 @@ public class EnemyBulletBehavior : MonoBehaviour
 		DefaulCollision();
 	}
 
+	IEnumerator DestroyMe ()
+	{
+		yield return new WaitForSeconds(lifeTime);
+		Destroy(gameObject);
+	}
 }
