@@ -41,6 +41,7 @@ public class GameState : MonoBehaviour {
 			PlayerPrefs.SetInt("HighScore", score);
 		}
 
+		EventManager.RemoveAllListerners();
 		SceneManager.LoadScene(deathScene);		
 	}
 
