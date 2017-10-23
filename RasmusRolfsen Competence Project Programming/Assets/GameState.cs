@@ -29,10 +29,18 @@ public class GameState : MonoBehaviour {
 	private void PlayerDied (object none,object none2)
 	{
 		PlayerPrefs.SetInt("GameScore",score);
-		if (PlayerPrefs.GetInt("HighScore") < score)
+		if (PlayerPrefs.HasKey("HighScore"))
 		{
-			PlayerPrefs.SetInt("HighScore",score);
+			if (PlayerPrefs.GetInt("HighScore") < score)
+			{
+				PlayerPrefs.SetInt("HighScore", score);
+			}
 		}
+		else
+		{
+			PlayerPrefs.SetInt("HighScore", score);
+		}
+
 		SceneManager.LoadScene(deathScene);		
 	}
 

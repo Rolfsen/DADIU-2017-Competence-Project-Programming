@@ -35,6 +35,7 @@ public class EnemyStates : MonoBehaviour
 	{
 		isAttackReady = true;
 		player = GameObject.FindGameObjectWithTag("Player").transform;
+		GetComponent<Renderer>().material.color = unitColors[0];
 	}
 
 
