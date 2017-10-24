@@ -49,6 +49,13 @@ public class EnemyStates : MonoBehaviour
 	private bool isAttackReady = true;
 
 
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.tag == "Ground")
+		{
+			Debug.Log("I smashed into the wall");
+		}
+	}
 
 
 
