@@ -28,7 +28,7 @@ public struct PatrolRoute
 	public int patrolTarget;
 	public float speed;
 	public int walkingDir;
-	public enum patrolTypes {closedLoop, openLoop};
+	public enum patrolTypes { closedLoop, openLoop };
 	public patrolTypes myPatrolType;
 }
 
@@ -49,16 +49,6 @@ public class EnemyStates : MonoBehaviour
 	private bool isAttackReady = true;
 
 
-	private void OnTriggerEnter(Collider other)
-	{
-		if (other.tag == "Ground")
-		{
-			Debug.Log("I smashed into the wall");
-		}
-	}
-
-
-
 
 	private void Awake()
 	{
@@ -76,7 +66,9 @@ public class EnemyStates : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		Raycasting(transform, randomTesting);
+
+		GetEnemyState();
+		Debug.Log(currentDetectionState);
 
 		switch (objectState)
 		{
@@ -94,7 +86,6 @@ public class EnemyStates : MonoBehaviour
 
 	private void IdleBehavior()
 	{
-		Debug.Log(thisType);
 		switch (thisType)
 		{
 			case (enemyType.turrent):
@@ -124,13 +115,12 @@ public class EnemyStates : MonoBehaviour
 		{
 			if (transform.position == patrolRoute.patrolRoute[patrolRoute.patrolTarget].position)
 			{
-				if (patrolRoute.patrolTarget == patrolRoute.patrolRoute.Count-1 || patrolRoute.patrolTarget == 0)
+				if (patrolRoute.patrolTarget == patrolRoute.patrolRoute.Count - 1 || patrolRoute.patrolTarget == 0)
 				{
 					patrolRoute.walkingDir *= -1;
 				}
 				patrolRoute.patrolTarget += patrolRoute.walkingDir;
 			}
-			Debug.Log(patrolRoute.patrolTarget);
 			transform.position = Vector3.MoveTowards(transform.position, patrolRoute.patrolRoute[patrolRoute.patrolTarget].position, patrolRoute.speed * Time.deltaTime);
 		}
 	}
@@ -177,14 +167,115 @@ public class EnemyStates : MonoBehaviour
 		isAttackReady = true;
 	}
 
+	[SerializeField]
+	private float noticeRange;
+	[SerializeField]
+	private float bufferRange;
+	[SerializeField]
+	private float attackRange;
 
-	void Raycasting (Transform target, UnityAction action)
+	private enum detectionState { undetected, detected, attack };
+	[SerializeField]
+	detectionState currentDetectionState;
+
+	private float distanceToPlayer;
+
+	private void GetEnemyState()
+	{
+		distanceToPlayer = Vector3.Distance(transform.position, player.position);
+		switch (currentDetectionState)
+		{
+			case (detectionState.undetected):
+				PlayerUndetectedState();
+				break;
+			case (detectionState.detected):
+				PlayerDetectedState();
+				break;
+			case (detectionState.attack):
+				DetectionStateAttack();
+				break;
+			default:
+				Debug.LogError("Unknown Detection State Entered " + currentDetectionState);
+				break;
+		}
+	}
+
+	private void PlayerUndetectedState()
+	{
+		if (distanceToPlayer < noticeRange)
+		{
+			Vector3 dir = player.position - transform.position;
+			Ray ray = new Ray(transform.position, dir);
+			RaycastHit hit;
+			Debug.DrawRay(transform.position, dir);
+			if (Physics.Raycast(ray, out hit, noticeRange))
+			{
+				if (hit.transform.tag == "Player")
+				{
+					currentDetectionState = detectionState.detected;
+				}
+			}
+		}
+	}
+
+	private void PlayerDetectedState()
+	{
+		Vector3 dir = player.position - transform.position;
+		Ray ray = new Ray(transform.position, dir);
+		RaycastHit hit;
+
+		if (Physics.Raycast(ray, out hit, noticeRange))
+		{
+			if (hit.transform.tag == "Player")
+			{
+				if (distanceToPlayer < attackRange)
+				{
+					currentDetectionState = detectionState.attack;
+				}
+				else if (distanceToPlayer > noticeRange)
+				{
+					currentDetectionState = detectionState.undetected;
+				}
+			}
+			else
+			{
+				currentDetectionState = detectionState.undetected;
+			}
+		}
+		else
+		{
+			Debug.Log("no hit");
+			currentDetectionState = detectionState.undetected;
+		}
+	}
+	private void DetectionStateAttack()
+	{
+		Vector3 dir = player.position - transform.position;
+		Ray ray = new Ray(transform.position, dir);
+		RaycastHit hit;
+
+		if (Physics.Raycast(ray, out hit, bufferRange))
+		{
+			// Stay in attack mode
+		}
+		else if (Physics.Raycast(ray, out hit, noticeRange))
+		{
+			currentDetectionState = detectionState.detected;
+		}
+		else
+		{
+			currentDetectionState = detectionState.undetected;
+		}
+	}
+
+
+
+	void Raycasting(Transform target, UnityAction action)
 	{
 		action.Invoke();
 	}
 
 	void randomTesting()
 	{
-		Debug.Log("hej");
 	}
 }
