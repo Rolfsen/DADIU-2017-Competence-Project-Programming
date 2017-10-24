@@ -74,7 +74,6 @@ public class EnemyStates : MonoBehaviour
 	{
 
 		GetEnemyState();
-		Debug.Log(objectState);
 
 		switch (objectState)
 		{
@@ -119,6 +118,14 @@ public class EnemyStates : MonoBehaviour
 		}
 		else
 		{
+			if (patrolRoute.myPatrolType == PatrolRoute.patrolTypes.openLoop)
+			{
+
+			}
+			else if (patrolRoute.myPatrolType == PatrolRoute.patrolTypes.closedLoop)
+			{
+
+			}
 			if (transform.position == patrolRoute.patrolRoute[patrolRoute.patrolTarget].position)
 			{
 				if (patrolRoute.patrolTarget == patrolRoute.patrolRoute.Count - 1 || patrolRoute.patrolTarget == 0)
@@ -164,7 +171,7 @@ public class EnemyStates : MonoBehaviour
 
 	private void NoticeBehavior()
 	{
-		//
+		
 	}
 
 	IEnumerator Cooldown(float cooldownTime)
