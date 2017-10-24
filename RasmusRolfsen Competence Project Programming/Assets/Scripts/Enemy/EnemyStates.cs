@@ -222,13 +222,27 @@ public class EnemyStates : MonoBehaviour
 		Ray ray = new Ray(transform.position, dir);
 		RaycastHit hit;
 
-		if (Physics.Raycast(ray,out hit, attackRange))
+		if (Physics.Raycast(ray, out hit, attackRange))
 		{
-			currentDetectionState = detectionState.attack;
+			if (hit.transform.tag != "Player")
+			{
+				currentDetectionState = detectionState.undetected;
+			}
+			else
+			{
+				currentDetectionState = detectionState.attack;
+			}
 		}
 		else if (Physics.Raycast(ray, out hit, noticeRange))
 		{
+			if (hit.transform.tag != "Player")
+			{
+				currentDetectionState = detectionState.undetected;
+			}
+			else
+			{
 			currentDetectionState = detectionState.detected;
+			}
 		}
 		else
 		{
@@ -243,11 +257,21 @@ public class EnemyStates : MonoBehaviour
 
 		if (Physics.Raycast(ray, out hit, bufferRange))
 		{
-			// Stay in attack mode
+			if (hit.transform.tag != "Player")
+			{
+				currentDetectionState = detectionState.undetected;
+			}
 		}
 		else if (Physics.Raycast(ray, out hit, noticeRange))
 		{
-			currentDetectionState = detectionState.detected;
+			if (hit.transform.tag != "Player")
+			{
+				currentDetectionState = detectionState.undetected;
+			}
+			else
+			{
+				currentDetectionState = detectionState.detected;
+			}
 		}
 		else
 		{
