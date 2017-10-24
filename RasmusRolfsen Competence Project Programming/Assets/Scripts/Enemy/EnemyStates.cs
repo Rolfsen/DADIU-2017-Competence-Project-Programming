@@ -182,7 +182,7 @@ public class EnemyStates : MonoBehaviour
 
 	private void GetEnemyState()
 	{
-		distanceToPlayer = Vector3.Distance(transform.position, player.position);
+		//distanceToPlayer = Vector3.Distance(transform.position, player.position);
 		switch (currentDetectionState)
 		{
 			case (detectionState.undetected):
@@ -202,18 +202,16 @@ public class EnemyStates : MonoBehaviour
 
 	private void PlayerUndetectedState()
 	{
-		if (distanceToPlayer < noticeRange)
+
+		Vector3 dir = player.position - transform.position;
+		Ray ray = new Ray(transform.position, dir);
+		RaycastHit hit;
+		Debug.DrawRay(transform.position, dir);
+		if (Physics.Raycast(ray, out hit, noticeRange))
 		{
-			Vector3 dir = player.position - transform.position;
-			Ray ray = new Ray(transform.position, dir);
-			RaycastHit hit;
-			Debug.DrawRay(transform.position, dir);
-			if (Physics.Raycast(ray, out hit, noticeRange))
+			if (hit.transform.tag == "Player")
 			{
-				if (hit.transform.tag == "Player")
-				{
-					currentDetectionState = detectionState.detected;
-				}
+				currentDetectionState = detectionState.detected;
 			}
 		}
 	}
@@ -224,27 +222,16 @@ public class EnemyStates : MonoBehaviour
 		Ray ray = new Ray(transform.position, dir);
 		RaycastHit hit;
 
-		if (Physics.Raycast(ray, out hit, noticeRange))
+		if (Physics.Raycast(ray,out hit, attackRange))
 		{
-			if (hit.transform.tag == "Player")
-			{
-				if (distanceToPlayer < attackRange)
-				{
-					currentDetectionState = detectionState.attack;
-				}
-				else if (distanceToPlayer > noticeRange)
-				{
-					currentDetectionState = detectionState.undetected;
-				}
-			}
-			else
-			{
-				currentDetectionState = detectionState.undetected;
-			}
+			currentDetectionState = detectionState.attack;
+		}
+		else if (Physics.Raycast(ray, out hit, noticeRange))
+		{
+			currentDetectionState = detectionState.detected;
 		}
 		else
 		{
-			Debug.Log("no hit");
 			currentDetectionState = detectionState.undetected;
 		}
 	}
