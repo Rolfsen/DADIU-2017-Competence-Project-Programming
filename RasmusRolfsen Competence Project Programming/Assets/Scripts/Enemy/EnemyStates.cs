@@ -174,13 +174,9 @@ public class EnemyStates : MonoBehaviour
 	[SerializeField]
 	private float attackRange;
 
-	//private enum detectionState { undetected, detected, attack };
-	//[SerializeField]
-	//detectionState enemyState;
-
+	
 	private void GetEnemyState()
 	{
-		//distanceToPlayer = Vector3.Distance(transform.position, player.position);
 		switch (objectState)
 		{
 			case (enemyState.idle):
@@ -275,16 +271,5 @@ public class EnemyStates : MonoBehaviour
 		{
 			objectState = enemyState.idle;
 		}
-	}
-
-
-
-	void Raycasting(Transform target, UnityAction action)
-	{
-		action.Invoke();
-	}
-
-	void randomTesting()
-	{
 	}
 }
