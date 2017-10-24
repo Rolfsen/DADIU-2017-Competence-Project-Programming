@@ -35,7 +35,7 @@ public struct PatrolRoute
 public class EnemyStates : MonoBehaviour
 {
 	public Color[] unitColors = new Color[3];
-	public enum enemyState { idle, patrol, notice, attack, chase, returnToPosition };
+	public enum enemyState { idle, notice, attack };
 	public enemyState objectState;
 	public enum enemyType { patrol, turrent }
 
@@ -177,8 +177,6 @@ public class EnemyStates : MonoBehaviour
 	private enum detectionState { undetected, detected, attack };
 	[SerializeField]
 	detectionState currentDetectionState;
-
-	private float distanceToPlayer;
 
 	private void GetEnemyState()
 	{
