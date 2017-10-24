@@ -68,7 +68,7 @@ public class EnemyStates : MonoBehaviour
 	{
 
 		GetEnemyState();
-		Debug.Log(currentDetectionState);
+		Debug.Log(objectState);
 
 		switch (objectState)
 		{
@@ -174,26 +174,26 @@ public class EnemyStates : MonoBehaviour
 	[SerializeField]
 	private float attackRange;
 
-	private enum detectionState { undetected, detected, attack };
-	[SerializeField]
-	detectionState currentDetectionState;
+	//private enum detectionState { undetected, detected, attack };
+	//[SerializeField]
+	//detectionState enemyState;
 
 	private void GetEnemyState()
 	{
 		//distanceToPlayer = Vector3.Distance(transform.position, player.position);
-		switch (currentDetectionState)
+		switch (objectState)
 		{
-			case (detectionState.undetected):
+			case (enemyState.idle):
 				PlayerUndetectedState();
 				break;
-			case (detectionState.detected):
+			case (enemyState.notice):
 				PlayerDetectedState();
 				break;
-			case (detectionState.attack):
+			case (enemyState.attack):
 				DetectionStateAttack();
 				break;
 			default:
-				Debug.LogError("Unknown Detection State Entered " + currentDetectionState);
+				Debug.LogError("Unknown Detection State Entered " + objectState);
 				break;
 		}
 	}
@@ -209,7 +209,7 @@ public class EnemyStates : MonoBehaviour
 		{
 			if (hit.transform.tag == "Player")
 			{
-				currentDetectionState = detectionState.detected;
+				objectState = enemyState.notice;
 			}
 		}
 	}
@@ -224,27 +224,27 @@ public class EnemyStates : MonoBehaviour
 		{
 			if (hit.transform.tag != "Player")
 			{
-				currentDetectionState = detectionState.undetected;
+				objectState = enemyState.idle;
 			}
 			else
 			{
-				currentDetectionState = detectionState.attack;
+				objectState = enemyState.attack;
 			}
 		}
 		else if (Physics.Raycast(ray, out hit, noticeRange))
 		{
 			if (hit.transform.tag != "Player")
 			{
-				currentDetectionState = detectionState.undetected;
+				objectState = enemyState.idle;
 			}
 			else
 			{
-			currentDetectionState = detectionState.detected;
+				objectState = enemyState.notice;
 			}
 		}
 		else
 		{
-			currentDetectionState = detectionState.undetected;
+			objectState = enemyState.idle;
 		}
 	}
 	private void DetectionStateAttack()
@@ -257,23 +257,23 @@ public class EnemyStates : MonoBehaviour
 		{
 			if (hit.transform.tag != "Player")
 			{
-				currentDetectionState = detectionState.undetected;
+				objectState = enemyState.idle;
 			}
 		}
 		else if (Physics.Raycast(ray, out hit, noticeRange))
 		{
 			if (hit.transform.tag != "Player")
 			{
-				currentDetectionState = detectionState.undetected;
+				objectState = enemyState.idle;
 			}
 			else
 			{
-				currentDetectionState = detectionState.detected;
+				objectState = enemyState.notice;
 			}
 		}
 		else
 		{
-			currentDetectionState = detectionState.undetected;
+			objectState = enemyState.idle;
 		}
 	}
 
