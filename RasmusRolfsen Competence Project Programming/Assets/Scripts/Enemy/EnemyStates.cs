@@ -45,6 +45,12 @@ public class EnemyStates : MonoBehaviour
 	private List<EnemyAttackTypes> enemyAttacks = null;
 	[SerializeField]
 	private PatrolRoute patrolRoute;
+	[SerializeField]
+	private float noticeRange;
+	[SerializeField]
+	private float bufferRange;
+	[SerializeField]
+	private float attackRange;
 	private Transform player;
 	private bool isAttackReady = true;
 
@@ -167,12 +173,6 @@ public class EnemyStates : MonoBehaviour
 		isAttackReady = true;
 	}
 
-	[SerializeField]
-	private float noticeRange;
-	[SerializeField]
-	private float bufferRange;
-	[SerializeField]
-	private float attackRange;
 
 	
 	private void GetEnemyState()
@@ -206,6 +206,7 @@ public class EnemyStates : MonoBehaviour
 			if (hit.transform.tag == "Player")
 			{
 				objectState = enemyState.notice;
+				ChangeMaterialColor(unitColors[1]);
 			}
 		}
 	}
@@ -221,10 +222,14 @@ public class EnemyStates : MonoBehaviour
 			if (hit.transform.tag != "Player")
 			{
 				objectState = enemyState.idle;
+				ChangeMaterialColor(unitColors[0]);
+
 			}
 			else
 			{
 				objectState = enemyState.attack;
+				ChangeMaterialColor(unitColors[2]);
+
 			}
 		}
 		else if (Physics.Raycast(ray, out hit, noticeRange))
@@ -232,15 +237,21 @@ public class EnemyStates : MonoBehaviour
 			if (hit.transform.tag != "Player")
 			{
 				objectState = enemyState.idle;
+				ChangeMaterialColor(unitColors[0]);
+
 			}
 			else
 			{
 				objectState = enemyState.notice;
+				ChangeMaterialColor(unitColors[1]);
+
 			}
 		}
 		else
 		{
 			objectState = enemyState.idle;
+			ChangeMaterialColor(unitColors[0]);
+
 		}
 	}
 	private void DetectionStateAttack()
@@ -254,6 +265,8 @@ public class EnemyStates : MonoBehaviour
 			if (hit.transform.tag != "Player")
 			{
 				objectState = enemyState.idle;
+				ChangeMaterialColor(unitColors[0]);
+
 			}
 		}
 		else if (Physics.Raycast(ray, out hit, noticeRange))
@@ -261,15 +274,24 @@ public class EnemyStates : MonoBehaviour
 			if (hit.transform.tag != "Player")
 			{
 				objectState = enemyState.idle;
+				ChangeMaterialColor(unitColors[0]);
+
 			}
 			else
 			{
 				objectState = enemyState.notice;
+				ChangeMaterialColor(unitColors[1]);
 			}
 		}
 		else
 		{
 			objectState = enemyState.idle;
+			ChangeMaterialColor(unitColors[0]);
 		}
+	}
+
+	private void ChangeMaterialColor(Color col)
+	{
+		GetComponent<Renderer>().material.color = col;
 	}
 }
