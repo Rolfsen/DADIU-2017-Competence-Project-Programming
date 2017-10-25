@@ -234,7 +234,7 @@ public class EnemyStates : MonoBehaviour
 
 	private void IdleTurrent()
 	{
-		Debug.Log("Idle Turrent");
+		//Debug.Log("Idle Turrent");
 	}
 
 	private void IdlePatrol()
