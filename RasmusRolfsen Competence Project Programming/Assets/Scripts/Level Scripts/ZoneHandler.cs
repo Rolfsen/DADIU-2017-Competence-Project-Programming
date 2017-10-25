@@ -15,10 +15,6 @@ public class ZoneHandler : MonoBehaviour
 	[SerializeField]
 	private List<GameObject> CurrentZones = null;
 	[SerializeField]
-	private AnimationCurve increaseDifficulty = null;
-	[SerializeField]
-	private float startDifficulty = 0;
-	[SerializeField]
 	private List<SpawnableZones> zones = null;
 
 	private void Awake()
