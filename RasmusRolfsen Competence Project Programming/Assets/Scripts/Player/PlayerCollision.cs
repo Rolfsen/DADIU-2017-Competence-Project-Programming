@@ -61,7 +61,7 @@ public class PlayerCollision : MonoBehaviour
 			foreach (ContactPoint contact in collission.contacts)
 			{
 				Vector3 dir = collission.contacts[0].point - transform.position;
-
+				Debug.Log(dir);
 				if (dir.y > thresholdMin && dir.y < thresholdMax)
 				{
 					EventManager.TriggerEvent("GroundCollision", null, null);
