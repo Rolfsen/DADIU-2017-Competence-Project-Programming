@@ -8,8 +8,8 @@ public class PlayerHealth : MonoBehaviour {
 	[SerializeField]
 	private string HealthEvent;
 	[SerializeField]
-	private int maxHealth;
-	private int currentHealth;
+	private float maxHealth;
+	private float currentHealth;
 
 
 	private void Awake()
@@ -20,7 +20,7 @@ public class PlayerHealth : MonoBehaviour {
 
 	private void ChangeHealth(object healthChange, object none)
 	{
-		currentHealth += (int) healthChange;
+		currentHealth += (float) healthChange;
 		Debug.Log(currentHealth);
 		if (currentHealth > maxHealth)
 		{

@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemyBulletBehavior : MonoBehaviour
 {
 
-	public int damage;
+	public float damage;
 	public float moveSpeed;
 	public Vector3 moveDir;
 	public List<ParticleEffect> particleEffects;

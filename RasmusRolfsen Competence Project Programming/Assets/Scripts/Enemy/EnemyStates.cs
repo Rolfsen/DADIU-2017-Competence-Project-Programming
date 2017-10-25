@@ -8,7 +8,7 @@ public struct EnemyAttackTypes
 {
 	public float attackSpeed;
 	public float bulletSpeed;
-	public int damage;
+	public float damage;
 	public GameObject bulletType;
 	public Color bulletColor;
 	public List<ParticleEffect> particleEffect;

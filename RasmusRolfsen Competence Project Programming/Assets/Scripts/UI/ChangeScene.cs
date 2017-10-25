@@ -12,5 +12,6 @@ public class ChangeScene : MonoBehaviour {
 	{
 		EventManager.RemoveAllListerners();
 		SceneManager.LoadScene(newScene);
+		Time.timeScale = 1;
 	}
 }
