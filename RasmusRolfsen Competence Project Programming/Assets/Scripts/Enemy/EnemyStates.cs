@@ -120,24 +120,43 @@ public class EnemyStates : MonoBehaviour
 		{
 			if (patrolRoute.myPatrolType == PatrolRoute.patrolTypes.openLoop)
 			{
-
+				OpenLoopMovement();
 			}
 			else if (patrolRoute.myPatrolType == PatrolRoute.patrolTypes.closedLoop)
 			{
-
+				ClosedLoopMovement();
 			}
-			if (transform.position == patrolRoute.patrolRoute[patrolRoute.patrolTarget].position)
-			{
-				if (patrolRoute.patrolTarget == patrolRoute.patrolRoute.Count - 1 || patrolRoute.patrolTarget == 0)
-				{
-					patrolRoute.walkingDir *= -1;
-				}
-				patrolRoute.patrolTarget += patrolRoute.walkingDir;
-			}
-			transform.position = Vector3.MoveTowards(transform.position, patrolRoute.patrolRoute[patrolRoute.patrolTarget].position, patrolRoute.speed * Time.deltaTime);
 		}
 	}
 
+	private void OpenLoopMovement()
+	{
+		if (transform.position == patrolRoute.patrolRoute[patrolRoute.patrolTarget].position)
+		{
+			if (patrolRoute.patrolTarget == patrolRoute.patrolRoute.Count - 1 || patrolRoute.patrolTarget == 0)
+			{
+				patrolRoute.walkingDir *= -1;
+			}
+			patrolRoute.patrolTarget += patrolRoute.walkingDir;
+		}
+		transform.position = Vector3.MoveTowards(transform.position, patrolRoute.patrolRoute[patrolRoute.patrolTarget].position, patrolRoute.speed * Time.deltaTime);
+	}
+
+	private void ClosedLoopMovement()
+	{
+		if (transform.position == patrolRoute.patrolRoute[patrolRoute.patrolTarget].position)
+		{
+			if (patrolRoute.patrolTarget == patrolRoute.patrolRoute.Count - 1)
+			{
+				patrolRoute.patrolTarget = 0;
+			}
+			else
+			{
+				patrolRoute.patrolTarget ++;
+			}
+		}
+		transform.position = Vector3.MoveTowards(transform.position, patrolRoute.patrolRoute[patrolRoute.patrolTarget].position, patrolRoute.speed * Time.deltaTime);
+	}
 	private void AttackBehavior()
 	{
 		if (isAttackReady)
@@ -171,7 +190,7 @@ public class EnemyStates : MonoBehaviour
 
 	private void NoticeBehavior()
 	{
-		
+
 	}
 
 	IEnumerator Cooldown(float cooldownTime)
@@ -181,7 +200,7 @@ public class EnemyStates : MonoBehaviour
 	}
 
 
-	
+
 	private void GetEnemyState()
 	{
 		switch (objectState)
