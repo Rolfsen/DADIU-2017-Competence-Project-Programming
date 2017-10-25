@@ -53,11 +53,15 @@ public class EnemyStates : MonoBehaviour
 	private float attackRange;
 	private Transform player;
 	private bool isAttackReady = true;
+	private bool isPathBlocked = false;
+	private Vector3 startPosition;
 
 
 
 	private void Awake()
 	{
+		startPosition = transform.position;
+		isPathBlocked = false;
 		patrolRoute.walkingDir = -1;
 		if (thisType == enemyType.turrent)
 		{
@@ -89,6 +93,7 @@ public class EnemyStates : MonoBehaviour
 		}
 	}
 
+
 	private void IdleBehavior()
 	{
 		switch (thisType)
@@ -116,7 +121,7 @@ public class EnemyStates : MonoBehaviour
 		{
 			Debug.LogError("No assigned waypoints for patrol - create a patrol route or pick Turrent instead");
 		}
-		else
+		else if (isPathBlocked == false)
 		{
 			if (patrolRoute.myPatrolType == PatrolRoute.patrolTypes.openLoop)
 			{
@@ -125,6 +130,58 @@ public class EnemyStates : MonoBehaviour
 			else if (patrolRoute.myPatrolType == PatrolRoute.patrolTypes.closedLoop)
 			{
 				ClosedLoopMovement();
+			}
+		}
+		else
+		{
+			Ray ray = new Ray(transform.position, startPosition - transform.position);
+			RaycastHit hit;
+			if (Physics.Raycast(ray, out hit, Vector3.Distance(startPosition, transform.position)))
+			{
+				if (hit.transform.tag == "Ground")
+				{
+					Debug.Log("I am here");
+					for (int i = 0; i < patrolRoute.patrolRoute.Count; i++)
+					{
+						Ray newRay = new Ray(transform.position, patrolRoute.patrolRoute[i].position - transform.position);
+						RaycastHit newHit;
+						if (Physics.Raycast(newRay, out newHit, Vector3.Distance(patrolRoute.patrolRoute[i].position, transform.position)))
+						{
+							if (newHit.transform.tag == "Ground")
+							{
+								// Ignore
+							}
+							else
+							{
+								Debug.Log("Found target " + i);
+								patrolRoute.patrolTarget = i;
+								isPathBlocked = false;
+								break;
+							}
+						}
+						if (i == patrolRoute.patrolRoute.Count - 1)
+						{
+							thisType = enemyType.turrent;
+							Debug.Log("No possible paths found");
+						}
+					}
+				}
+				else
+				{
+					transform.position = Vector3.MoveTowards(transform.position, startPosition, patrolRoute.speed*Time.deltaTime);
+					if (transform.position == startPosition)
+					{
+						thisType = enemyType.turrent;
+					}
+				}
+			}
+			else
+			{
+				transform.position = Vector3.MoveTowards(transform.position, startPosition, patrolRoute.speed* Time.deltaTime);
+				if (transform.position == startPosition)
+				{
+					thisType = enemyType.turrent;
+				}
 			}
 		}
 	}
@@ -152,7 +209,7 @@ public class EnemyStates : MonoBehaviour
 			}
 			else
 			{
-				patrolRoute.patrolTarget ++;
+				patrolRoute.patrolTarget++;
 			}
 		}
 		transform.position = Vector3.MoveTowards(transform.position, patrolRoute.patrolRoute[patrolRoute.patrolTarget].position, patrolRoute.speed * Time.deltaTime);
@@ -226,7 +283,6 @@ public class EnemyStates : MonoBehaviour
 		Vector3 dir = player.position - transform.position;
 		Ray ray = new Ray(transform.position, dir);
 		RaycastHit hit;
-		Debug.DrawRay(transform.position, dir);
 		if (Physics.Raycast(ray, out hit, noticeRange))
 		{
 			if (hit.transform.tag == "Player")
@@ -319,5 +375,13 @@ public class EnemyStates : MonoBehaviour
 	private void ChangeMaterialColor(Color col)
 	{
 		GetComponent<Renderer>().material.color = col;
+	}
+
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.gameObject.tag == "Ground")
+		{
+			isPathBlocked = true;
+		}
 	}
 }

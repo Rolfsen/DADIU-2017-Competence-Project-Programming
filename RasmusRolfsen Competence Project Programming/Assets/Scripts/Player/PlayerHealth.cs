@@ -21,7 +21,6 @@ public class PlayerHealth : MonoBehaviour {
 	private void ChangeHealth(object healthChange, object none)
 	{
 		currentHealth += (float) healthChange;
-		Debug.Log(currentHealth);
 		if (currentHealth > maxHealth)
 		{
 			currentHealth = maxHealth;
