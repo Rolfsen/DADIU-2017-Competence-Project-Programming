@@ -6,10 +6,8 @@ public class PauseGame : MonoBehaviour {
 
 	[SerializeField]
 	private GameObject player = null;
-
 	[SerializeField]
 	private GameObject pauseCanvas = null;
-
 
 	private void Awake()
 	{

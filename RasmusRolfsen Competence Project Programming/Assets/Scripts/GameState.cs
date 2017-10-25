@@ -7,17 +7,12 @@ public class GameState : MonoBehaviour {
 
 	[SerializeField]
 	private int score;
-
-	[SerializeField]
-	private bool pauseGame;
-
 	[SerializeField]
 	private int currentHighScore;
-
 	[SerializeField]
 	private string deathScene;
-
-
+	[SerializeField]
+	private bool pauseGame;
 
 	private void Awake()
 	{

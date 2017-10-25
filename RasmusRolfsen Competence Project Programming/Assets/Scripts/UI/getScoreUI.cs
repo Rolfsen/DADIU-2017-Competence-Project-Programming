@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public class getScoreUI : MonoBehaviour {
+public class getScoreUI : MonoBehaviour
+{
 
 	// Use this for initialization
-	void Start () {
+	void Start()
+	{
 		int gainedScore = PlayerPrefs.GetInt("GameScore");
 
-		GetComponent<Text>().text = GetComponent<Text>().text + " " + gainedScore;		
+		GetComponent<Text>().text = GetComponent<Text>().text + " " + gainedScore;
 	}
 }

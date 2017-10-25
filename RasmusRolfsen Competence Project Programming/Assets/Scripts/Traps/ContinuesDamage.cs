@@ -6,11 +6,10 @@ public class ContinuesDamage : MonoBehaviour {
 
 	[SerializeField]
 	private float damageToPlayer;
-
-	[SerializeField]
-	private string particleEvent;
 	[SerializeField]
 	private int particleAmount;
+	[SerializeField]
+	private string particleEvent;
 
 	private void OnTriggerStay(Collider other)
 	{

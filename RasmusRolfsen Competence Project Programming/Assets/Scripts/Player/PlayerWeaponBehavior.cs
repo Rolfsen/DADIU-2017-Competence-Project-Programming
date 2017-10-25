@@ -22,16 +22,13 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	public Weapons[] playerWeapon = new Weapons[WeaponCount];
 	public int currentWeaponIndex = 0;
-
-	[SerializeField]
-	private KeyCode reloadKey = KeyCode.R;
-
 	[SerializeField]
 	private float changeWeaponTime = 3f;
 	[SerializeField]
 	private float shotDist = 1000;
+	[SerializeField]
+	private KeyCode reloadKey = KeyCode.R;
 
-	// rename name + currentWeaponIndex + isCooldown?
 	private bool changingWeapon = false;
 	private bool isShootCooldown = false;
 	private bool isBlocking = false;
