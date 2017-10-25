@@ -10,8 +10,6 @@ public class PauseGame : MonoBehaviour {
 	[SerializeField]
 	private GameObject pauseCanvas = null;
 
-	[SerializeField]
-	private List<GameObject> enemies = null; // use in case of errors at pause
 
 	private void Awake()
 	{

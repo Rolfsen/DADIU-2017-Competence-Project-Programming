@@ -5,11 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour {
 
+	public float maxHealth;
+	public float currentHealth;
+
 	[SerializeField]
 	private string HealthEvent;
-	[SerializeField]
-	private float maxHealth;
-	private float currentHealth;
 
 
 	private void Awake()

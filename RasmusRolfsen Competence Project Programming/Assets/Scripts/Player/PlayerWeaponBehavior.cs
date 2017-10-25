@@ -20,8 +20,8 @@ public class PlayerWeaponBehavior : MonoBehaviour
 {
 	private const int WeaponCount = 5;
 
-	[SerializeField]
-	private Weapons[] PlayerWeapons = new Weapons[WeaponCount];
+	public Weapons[] playerWeapon = new Weapons[WeaponCount];
+	public int currentWeaponIndex = 0;
 
 	[SerializeField]
 	private KeyCode reloadKey = KeyCode.R;
@@ -33,7 +33,6 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	// rename name + currentWeaponIndex + isCooldown?
 	private bool changingWeapon = false;
-	private int currentWeaponIndex = 0;
 	private bool isShootCooldown = false;
 	private bool isBlocking = false;
 	private bool isReloading = false;
@@ -63,11 +62,11 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	{
 		if ((bool)newState)
 		{
-			PlayerWeapons[currentWeaponIndex].isUnlocked = true;
+			playerWeapon[currentWeaponIndex].isUnlocked = true;
 		}
 		else
 		{
-			PlayerWeapons[currentWeaponIndex].isUnlocked = false;
+			playerWeapon[currentWeaponIndex].isUnlocked = false;
 		}
 
 	}
@@ -76,7 +75,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 	{
 		int weaponInd = (int)weaponIndex;
 		int addedAmmo = (int)amount;
-		PlayerWeapons[weaponInd].reserveAmmo += addedAmmo;
+		playerWeapon[weaponInd].reserveAmmo += addedAmmo;
 	}
 
 	private void Update()
@@ -88,20 +87,20 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 		if (Input.anyKey && !isBlocking && !isReloading)
 		{
-			if (Input.GetMouseButton(0) && PlayerWeapons[currentWeaponIndex].ammo > 0 && !isShootCooldown)
+			if (Input.GetMouseButton(0) && playerWeapon[currentWeaponIndex].ammo > 0 && !isShootCooldown)
 			{
 				StartCoroutine(Shoot());
 			}
-			else if (Input.GetMouseButton(0) && PlayerWeapons[currentWeaponIndex].ammo < 1 && !isShootCooldown)
+			else if (Input.GetMouseButton(0) && playerWeapon[currentWeaponIndex].ammo < 1 && !isShootCooldown)
 			{
 				StartCoroutine(Reload());
 			}
 
 			if (!changingWeapon)
 			{
-				for (int i = 0; i < PlayerWeapons.Length; i++)
+				for (int i = 0; i < playerWeapon.Length; i++)
 				{
-					if (Input.GetKeyDown(PlayerWeapons[i].changeWeaponKey) && PlayerWeapons[i].isUnlocked)
+					if (Input.GetKeyDown(playerWeapon[i].changeWeaponKey) && playerWeapon[i].isUnlocked)
 					{
 						StartCoroutine(ChangeWeapon(i));
 						break;
@@ -160,14 +159,14 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 
 		isShootCooldown = true;
-		PlayerWeapons[currentWeaponIndex].ammo--;
-		if (PlayerWeapons[currentWeaponIndex].ammo < 1)
+		playerWeapon[currentWeaponIndex].ammo--;
+		if (playerWeapon[currentWeaponIndex].ammo < 1)
 		{
 			StartCoroutine(Reload());
 		}
 		else
 		{
-			yield return new WaitForSeconds(PlayerWeapons[currentWeaponIndex].attackSpeed);
+			yield return new WaitForSeconds(playerWeapon[currentWeaponIndex].attackSpeed);
 		}
 
 		isShootCooldown = false;
@@ -175,7 +174,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 
 	private void EnemyHit(GameObject hit)
 	{
-		hit.GetComponent<EnemyHealth>().LoseHealth(PlayerWeapons[currentWeaponIndex].weaponDamage);
+		hit.GetComponent<EnemyHealth>().LoseHealth(playerWeapon[currentWeaponIndex].weaponDamage);
 	}
 
 	private void GroundHit(RaycastHit hit)
@@ -195,28 +194,28 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		isReloading = true;
 		if (currentWeaponIndex != 0)
 		{
-			if (PlayerWeapons[currentWeaponIndex].reserveAmmo < 1)
+			if (playerWeapon[currentWeaponIndex].reserveAmmo < 1)
 			{
 				isReloading = false;
 				StartCoroutine(ChangeWeapon(0));
 				StopCoroutine(Reload());
 			}
-			else if (PlayerWeapons[currentWeaponIndex].reserveAmmo >= PlayerWeapons[currentWeaponIndex].magasinSize)
+			else if (playerWeapon[currentWeaponIndex].reserveAmmo >= playerWeapon[currentWeaponIndex].magasinSize)
 			{
-				PlayerWeapons[currentWeaponIndex].ammo = PlayerWeapons[currentWeaponIndex].magasinSize;
-				PlayerWeapons[currentWeaponIndex].reserveAmmo -= PlayerWeapons[currentWeaponIndex].magasinSize;
+				playerWeapon[currentWeaponIndex].ammo = playerWeapon[currentWeaponIndex].magasinSize;
+				playerWeapon[currentWeaponIndex].reserveAmmo -= playerWeapon[currentWeaponIndex].magasinSize;
 			}
 			else
 			{
-				PlayerWeapons[currentWeaponIndex].ammo = PlayerWeapons[currentWeaponIndex].reserveAmmo;
-				PlayerWeapons[currentWeaponIndex].reserveAmmo = 0;
+				playerWeapon[currentWeaponIndex].ammo = playerWeapon[currentWeaponIndex].reserveAmmo;
+				playerWeapon[currentWeaponIndex].reserveAmmo = 0;
 			}
 		}
 		else
 		{
-			PlayerWeapons[currentWeaponIndex].ammo = PlayerWeapons[currentWeaponIndex].magasinSize;
+			playerWeapon[currentWeaponIndex].ammo = playerWeapon[currentWeaponIndex].magasinSize;
 		}
-		yield return new WaitForSeconds(PlayerWeapons[currentWeaponIndex].reloadTime);
+		yield return new WaitForSeconds(playerWeapon[currentWeaponIndex].reloadTime);
 		isReloading = false;
 	}
 
