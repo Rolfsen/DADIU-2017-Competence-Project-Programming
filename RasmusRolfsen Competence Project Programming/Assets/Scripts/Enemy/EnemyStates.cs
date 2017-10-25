@@ -93,6 +93,128 @@ public class EnemyStates : MonoBehaviour
 		}
 	}
 
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.gameObject.tag == "Ground")
+		{
+			isPathBlocked = true;
+		}
+	}
+
+	private void GetEnemyState()
+	{
+		switch (objectState)
+		{
+			case (enemyState.idle):
+				PlayerUndetectedState();
+				break;
+			case (enemyState.notice):
+				PlayerDetectedState();
+				break;
+			case (enemyState.attack):
+				DetectionStateAttack();
+				break;
+			default:
+				Debug.LogError("Unknown Detection State Entered " + objectState);
+				break;
+		}
+	}
+
+	private void PlayerUndetectedState()
+	{
+
+		Vector3 dir = player.position - transform.position;
+		Ray ray = new Ray(transform.position, dir);
+		RaycastHit hit;
+		if (Physics.Raycast(ray, out hit, noticeRange))
+		{
+			if (hit.transform.tag == "Player")
+			{
+				objectState = enemyState.notice;
+				ChangeMaterialColor(unitColors[1]);
+			}
+		}
+	}
+
+	private void PlayerDetectedState()
+	{
+		Vector3 dir = player.position - transform.position;
+		Ray ray = new Ray(transform.position, dir);
+		RaycastHit hit;
+
+		if (Physics.Raycast(ray, out hit, attackRange))
+		{
+			if (hit.transform.tag != "Player")
+			{
+				objectState = enemyState.idle;
+				ChangeMaterialColor(unitColors[0]);
+
+			}
+			else
+			{
+				objectState = enemyState.attack;
+				ChangeMaterialColor(unitColors[2]);
+
+			}
+		}
+		else if (Physics.Raycast(ray, out hit, noticeRange))
+		{
+			if (hit.transform.tag != "Player")
+			{
+				objectState = enemyState.idle;
+				ChangeMaterialColor(unitColors[0]);
+
+			}
+			else
+			{
+				objectState = enemyState.notice;
+				ChangeMaterialColor(unitColors[1]);
+
+			}
+		}
+		else
+		{
+			objectState = enemyState.idle;
+			ChangeMaterialColor(unitColors[0]);
+
+		}
+	}
+
+	private void DetectionStateAttack()
+	{
+		Vector3 dir = player.position - transform.position;
+		Ray ray = new Ray(transform.position, dir);
+		RaycastHit hit;
+
+		if (Physics.Raycast(ray, out hit, bufferRange))
+		{
+			if (hit.transform.tag != "Player")
+			{
+				objectState = enemyState.idle;
+				ChangeMaterialColor(unitColors[0]);
+
+			}
+		}
+		else if (Physics.Raycast(ray, out hit, noticeRange))
+		{
+			if (hit.transform.tag != "Player")
+			{
+				objectState = enemyState.idle;
+				ChangeMaterialColor(unitColors[0]);
+
+			}
+			else
+			{
+				objectState = enemyState.notice;
+				ChangeMaterialColor(unitColors[1]);
+			}
+		}
+		else
+		{
+			objectState = enemyState.idle;
+			ChangeMaterialColor(unitColors[0]);
+		}
+	}
 
 	private void IdleBehavior()
 	{
@@ -214,6 +336,7 @@ public class EnemyStates : MonoBehaviour
 		}
 		transform.position = Vector3.MoveTowards(transform.position, patrolRoute.patrolRoute[patrolRoute.patrolTarget].position, patrolRoute.speed * Time.deltaTime);
 	}
+
 	private void AttackBehavior()
 	{
 		if (isAttackReady)
@@ -250,138 +373,14 @@ public class EnemyStates : MonoBehaviour
 
 	}
 
-	IEnumerator Cooldown(float cooldownTime)
-	{
-		yield return new WaitForSeconds(cooldownTime);
-		isAttackReady = true;
-	}
-
-
-
-	private void GetEnemyState()
-	{
-		switch (objectState)
-		{
-			case (enemyState.idle):
-				PlayerUndetectedState();
-				break;
-			case (enemyState.notice):
-				PlayerDetectedState();
-				break;
-			case (enemyState.attack):
-				DetectionStateAttack();
-				break;
-			default:
-				Debug.LogError("Unknown Detection State Entered " + objectState);
-				break;
-		}
-	}
-
-	private void PlayerUndetectedState()
-	{
-
-		Vector3 dir = player.position - transform.position;
-		Ray ray = new Ray(transform.position, dir);
-		RaycastHit hit;
-		if (Physics.Raycast(ray, out hit, noticeRange))
-		{
-			if (hit.transform.tag == "Player")
-			{
-				objectState = enemyState.notice;
-				ChangeMaterialColor(unitColors[1]);
-			}
-		}
-	}
-
-	private void PlayerDetectedState()
-	{
-		Vector3 dir = player.position - transform.position;
-		Ray ray = new Ray(transform.position, dir);
-		RaycastHit hit;
-
-		if (Physics.Raycast(ray, out hit, attackRange))
-		{
-			if (hit.transform.tag != "Player")
-			{
-				objectState = enemyState.idle;
-				ChangeMaterialColor(unitColors[0]);
-
-			}
-			else
-			{
-				objectState = enemyState.attack;
-				ChangeMaterialColor(unitColors[2]);
-
-			}
-		}
-		else if (Physics.Raycast(ray, out hit, noticeRange))
-		{
-			if (hit.transform.tag != "Player")
-			{
-				objectState = enemyState.idle;
-				ChangeMaterialColor(unitColors[0]);
-
-			}
-			else
-			{
-				objectState = enemyState.notice;
-				ChangeMaterialColor(unitColors[1]);
-
-			}
-		}
-		else
-		{
-			objectState = enemyState.idle;
-			ChangeMaterialColor(unitColors[0]);
-
-		}
-	}
-	private void DetectionStateAttack()
-	{
-		Vector3 dir = player.position - transform.position;
-		Ray ray = new Ray(transform.position, dir);
-		RaycastHit hit;
-
-		if (Physics.Raycast(ray, out hit, bufferRange))
-		{
-			if (hit.transform.tag != "Player")
-			{
-				objectState = enemyState.idle;
-				ChangeMaterialColor(unitColors[0]);
-
-			}
-		}
-		else if (Physics.Raycast(ray, out hit, noticeRange))
-		{
-			if (hit.transform.tag != "Player")
-			{
-				objectState = enemyState.idle;
-				ChangeMaterialColor(unitColors[0]);
-
-			}
-			else
-			{
-				objectState = enemyState.notice;
-				ChangeMaterialColor(unitColors[1]);
-			}
-		}
-		else
-		{
-			objectState = enemyState.idle;
-			ChangeMaterialColor(unitColors[0]);
-		}
-	}
-
 	private void ChangeMaterialColor(Color col)
 	{
 		GetComponent<Renderer>().material.color = col;
 	}
 
-	private void OnTriggerEnter(Collider other)
+	IEnumerator Cooldown(float cooldownTime)
 	{
-		if (other.gameObject.tag == "Ground")
-		{
-			isPathBlocked = true;
-		}
+		yield return new WaitForSeconds(cooldownTime);
+		isAttackReady = true;
 	}
 }

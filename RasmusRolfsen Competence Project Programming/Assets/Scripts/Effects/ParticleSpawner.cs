@@ -6,7 +6,6 @@ public class ParticleSpawner : MonoBehaviour {
 
 	public ParticleSystem pSystem;
 
-	
 	public void EmitParticle(ParticleSystem particleSystem, int amount, float liveTime)
 	{
 		particleSystem.Emit(amount);
