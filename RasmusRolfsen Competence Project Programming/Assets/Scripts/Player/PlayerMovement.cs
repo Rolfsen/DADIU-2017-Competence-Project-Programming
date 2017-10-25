@@ -7,9 +7,7 @@ public class PlayerMovement : MonoBehaviour
 	// jumping state specify and falling
 	public enum PlayerState { idle, running, airMovement, blocking, dashing, afterBlock };
 	public enum MovementDir { left, right, none };
-	[SerializeField]
 	public PlayerState currentState = PlayerState.idle;
-	[SerializeField]
 	public MovementDir currentDir = MovementDir.right;
 
 	[SerializeField]
@@ -20,7 +18,6 @@ public class PlayerMovement : MonoBehaviour
 	private float blockMaxDuration = 3;
 	[SerializeField]
 	private float blockCooldown = 3;
-
 	[SerializeField]
 	private KeyCode blockKey = KeyCode.LeftControl;
 	[SerializeField]
@@ -35,7 +32,6 @@ public class PlayerMovement : MonoBehaviour
 	private bool haveDoubleJumped = false;
 	private bool floorCol = false;
 	private bool startBlock = false;
-
 	private Rigidbody rb;
 
 	private void Awake()
@@ -46,11 +42,9 @@ public class PlayerMovement : MonoBehaviour
 		isJumpKeyPressed = false;
 		startBlock = false;
 		floorCol = false;
-
 	}
 
 
-	// Update is called once per frame
 	private void Update()
 	{
 		switch (currentState)
@@ -74,7 +68,6 @@ public class PlayerMovement : MonoBehaviour
 				Debug.Assert(false);
 				break;
 		}
-
 	}
 
 	private void FixedUpdate()
@@ -214,13 +207,18 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
-	// Functions that control player movement and actions in states
 	private void AnyStateActions()
 	{
 		if (Input.GetKey(blockKey) && blockReady)
 		{
 			startBlock = true;
 		}
+	}
+	// Functions that control player movement and actions in states
+	public void Jump(float jumpStrength)
+	{
+		rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+		rb.AddForce(Vector3.up * jumpStrength, ForceMode.Impulse);
 	}
 
 	private void movePlayer()
@@ -238,14 +236,7 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
-
-	public void Jump(float jumpStrength)
-	{
-		rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-		rb.AddForce(Vector3.up * jumpStrength, ForceMode.Impulse);
-	}
-
-	void BlockDone()
+	private void BlockDone()
 	{
 		EventManager.TriggerEvent("PlayerBlockState",false,null);
 		blockReady = false;
@@ -257,8 +248,6 @@ public class PlayerMovement : MonoBehaviour
 	{
 		floorCol = true;
 	}
-
-
 
 	IEnumerator BlockTimer()
 	{
