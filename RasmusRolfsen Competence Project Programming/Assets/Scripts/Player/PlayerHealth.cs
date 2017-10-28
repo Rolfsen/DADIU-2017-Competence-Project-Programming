@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PlayerHealth : MonoBehaviour {
+public class PlayerHealth : MonoBehaviour
+{
 
 	public float maxHealth;
 	public float currentHealth;
@@ -20,14 +22,40 @@ public class PlayerHealth : MonoBehaviour {
 
 	private void ChangeHealth(object healthChange, object none)
 	{
-		currentHealth += (float) healthChange;
-		if (currentHealth > maxHealth)
+		try
 		{
-			currentHealth = maxHealth;
+			currentHealth += (float)healthChange;
+			if (currentHealth > maxHealth)
+			{
+				currentHealth = maxHealth;
+			}
+			else if (currentHealth <= 0)
+			{
+				EventManager.TriggerEvent("PlayerDied", 0, 0);
+			}
+
 		}
-		else if (currentHealth <= 0)
+		catch
 		{
-			EventManager.TriggerEvent("PlayerDied",0,0);			
+			try
+			{
+				int tmpVar = (int)healthChange;
+				float convertedVar = (float)tmpVar;
+				currentHealth += (float)convertedVar;
+				if (currentHealth > maxHealth)
+				{
+					currentHealth = maxHealth;
+				}
+				else if (currentHealth <= 0)
+				{
+					EventManager.TriggerEvent("PlayerDied", 0, 0);
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.LogError(e);
+			}
 		}
+
 	}
 }
