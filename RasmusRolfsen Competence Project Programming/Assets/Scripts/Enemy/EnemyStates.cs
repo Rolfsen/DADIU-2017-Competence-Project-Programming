@@ -28,8 +28,6 @@ public struct PatrolRoute
 	public int patrolTarget;
 	public float speed;
 	public int walkingDir;
-	public enum patrolTypes { closedLoop, openLoop };
-	public patrolTypes myPatrolType;
 }
 
 public class EnemyStates : MonoBehaviour
@@ -37,36 +35,30 @@ public class EnemyStates : MonoBehaviour
 	public Color[] unitColors = new Color[3];
 	public enum enemyState { idle, notice, attack };
 	public enemyState objectState;
-	public enum enemyType { patrol, turrent }
+
 
 	[SerializeField]
-	private enemyType thisType;
+	public List<EnemyAttackTypes> enemyAttacks = null;
 	[SerializeField]
-	private List<EnemyAttackTypes> enemyAttacks = null;
+	public PatrolRoute patrolRoute;
 	[SerializeField]
-	private PatrolRoute patrolRoute;
+	public float noticeRange;
 	[SerializeField]
-	private float noticeRange;
+	public float bufferRange;
 	[SerializeField]
-	private float bufferRange;
-	[SerializeField]
-	private float attackRange;
-	private Transform player;
-	private bool isAttackReady = true;
-	private bool isPathBlocked = false;
-	private Vector3 startPosition;
+	public float attackRange;
+	public Transform player;
+	public bool isAttackReady = true;
+	public bool isPathBlocked = false;
+	public Vector3 startPosition;
 
 
 
-	private void Awake()
+	public virtual void Awake()
 	{
 		startPosition = transform.position;
 		isPathBlocked = false;
 		patrolRoute.walkingDir = -1;
-		if (thisType == enemyType.turrent)
-		{
-			patrolRoute.patrolRoute = null;
-		}
 		isAttackReady = true;
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 		GetComponent<Renderer>().material.color = unitColors[0];
@@ -101,7 +93,7 @@ public class EnemyStates : MonoBehaviour
 		}
 	}
 
-	private void GetEnemyState()
+	public virtual void GetEnemyState()
 	{
 		switch (objectState)
 		{
@@ -120,7 +112,7 @@ public class EnemyStates : MonoBehaviour
 		}
 	}
 
-	private void PlayerUndetectedState()
+	public virtual void PlayerUndetectedState()
 	{
 
 		Vector3 dir = player.position - transform.position;
@@ -136,7 +128,7 @@ public class EnemyStates : MonoBehaviour
 		}
 	}
 
-	private void PlayerDetectedState()
+	public virtual void PlayerDetectedState()
 	{
 		Vector3 dir = player.position - transform.position;
 		Ray ray = new Ray(transform.position, dir);
@@ -180,7 +172,7 @@ public class EnemyStates : MonoBehaviour
 		}
 	}
 
-	private void DetectionStateAttack()
+	public virtual void DetectionStateAttack()
 	{
 		Vector3 dir = player.position - transform.position;
 		Ray ray = new Ray(transform.position, dir);
@@ -216,99 +208,16 @@ public class EnemyStates : MonoBehaviour
 		}
 	}
 
-	private void IdleBehavior()
+	public virtual void IdleBehavior()
 	{
-		switch (thisType)
-		{
-			case (enemyType.turrent):
-				IdleTurrent();
-				break;
-			case (enemyType.patrol):
-				IdlePatrol();
-				break;
-			default:
-				Debug.LogError("Unimplemented Idle Behaivior");
-				break;
-		}
+		// DO NOTHING
 	}
 
-	private void IdleTurrent()
+	public virtual void IdlePatrol()
 	{
-		//Debug.Log("Idle Turrent");
 	}
 
-	private void IdlePatrol()
-	{
-		if (patrolRoute.patrolRoute.Count < 1)
-		{
-			Debug.LogError("No assigned waypoints for patrol - create a patrol route or pick Turrent instead");
-		}
-		else if (isPathBlocked == false)
-		{
-			if (patrolRoute.myPatrolType == PatrolRoute.patrolTypes.openLoop)
-			{
-				OpenLoopMovement();
-			}
-			else if (patrolRoute.myPatrolType == PatrolRoute.patrolTypes.closedLoop)
-			{
-				ClosedLoopMovement();
-			}
-		}
-		else
-		{
-			Ray ray = new Ray(transform.position, startPosition - transform.position);
-			RaycastHit hit;
-			if (Physics.Raycast(ray, out hit, Vector3.Distance(startPosition, transform.position)))
-			{
-				if (hit.transform.tag == "Ground")
-				{
-					Debug.Log("I am here");
-					for (int i = 0; i < patrolRoute.patrolRoute.Count; i++)
-					{
-						Ray newRay = new Ray(transform.position, patrolRoute.patrolRoute[i].position - transform.position);
-						RaycastHit newHit;
-						if (Physics.Raycast(newRay, out newHit, Vector3.Distance(patrolRoute.patrolRoute[i].position, transform.position)))
-						{
-							if (newHit.transform.tag == "Ground")
-							{
-								// Ignore
-							}
-							else
-							{
-								Debug.Log("Found target " + i);
-								patrolRoute.patrolTarget = i;
-								isPathBlocked = false;
-								break;
-							}
-						}
-						if (i == patrolRoute.patrolRoute.Count - 1)
-						{
-							thisType = enemyType.turrent;
-							Debug.Log("No possible paths found");
-						}
-					}
-				}
-				else
-				{
-					transform.position = Vector3.MoveTowards(transform.position, startPosition, patrolRoute.speed*Time.deltaTime);
-					if (transform.position == startPosition)
-					{
-						thisType = enemyType.turrent;
-					}
-				}
-			}
-			else
-			{
-				transform.position = Vector3.MoveTowards(transform.position, startPosition, patrolRoute.speed* Time.deltaTime);
-				if (transform.position == startPosition)
-				{
-					thisType = enemyType.turrent;
-				}
-			}
-		}
-	}
-
-	private void OpenLoopMovement()
+	public virtual void OpenLoopMovement()
 	{
 		if (transform.position == patrolRoute.patrolRoute[patrolRoute.patrolTarget].position)
 		{
@@ -321,23 +230,8 @@ public class EnemyStates : MonoBehaviour
 		transform.position = Vector3.MoveTowards(transform.position, patrolRoute.patrolRoute[patrolRoute.patrolTarget].position, patrolRoute.speed * Time.deltaTime);
 	}
 
-	private void ClosedLoopMovement()
-	{
-		if (transform.position == patrolRoute.patrolRoute[patrolRoute.patrolTarget].position)
-		{
-			if (patrolRoute.patrolTarget == patrolRoute.patrolRoute.Count - 1)
-			{
-				patrolRoute.patrolTarget = 0;
-			}
-			else
-			{
-				patrolRoute.patrolTarget++;
-			}
-		}
-		transform.position = Vector3.MoveTowards(transform.position, patrolRoute.patrolRoute[patrolRoute.patrolTarget].position, patrolRoute.speed * Time.deltaTime);
-	}
 
-	private void AttackBehavior()
+	public virtual void AttackBehavior()
 	{
 		if (isAttackReady)
 		{
@@ -368,17 +262,17 @@ public class EnemyStates : MonoBehaviour
 		}
 	}
 
-	private void NoticeBehavior()
+	public virtual void NoticeBehavior()
 	{
 
 	}
 
-	private void ChangeMaterialColor(Color col)
+	public virtual void ChangeMaterialColor(Color col)
 	{
 		GetComponent<Renderer>().material.color = col;
 	}
 
-	IEnumerator Cooldown(float cooldownTime)
+	public virtual IEnumerator Cooldown(float cooldownTime)
 	{
 		yield return new WaitForSeconds(cooldownTime);
 		isAttackReady = true;

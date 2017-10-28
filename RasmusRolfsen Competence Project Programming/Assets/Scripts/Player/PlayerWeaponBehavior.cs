@@ -18,9 +18,7 @@ public struct Weapons
 
 public class PlayerWeaponBehavior : MonoBehaviour
 {
-	private const int WeaponCount = 5;
-
-	public Weapons[] playerWeapon = new Weapons[WeaponCount];
+	public Weapons[] playerWeapon;
 	public int currentWeaponIndex = 0;
 
 	[SerializeField]
@@ -48,6 +46,7 @@ public class PlayerWeaponBehavior : MonoBehaviour
 		isChangingWeapon = false;
 		isReloading = false;
 		line = GetComponent<LineRenderer>();
+		line.enabled = false;
 	}
 
 	private void Update()
