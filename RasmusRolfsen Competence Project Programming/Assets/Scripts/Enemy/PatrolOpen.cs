@@ -12,16 +12,6 @@ public class PatrolOpen : EnemyStates
 		}
 		else if (isPathBlocked == false)
 		{
-			/*
-			if (patrolRoute.myPatrolType == PatrolRoute.patrolTypes.openLoop)
-			{
-				OpenLoopMovement();
-			}
-			else if (patrolRoute.myPatrolType == PatrolRoute.patrolTypes.closedLoop)
-			{
-				ClosedLoopMovement();
-			}*/
-
 			Patrol();
 		}
 		else
