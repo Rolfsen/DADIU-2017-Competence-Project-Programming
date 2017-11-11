@@ -244,7 +244,7 @@ public class EnemyStates : MonoBehaviour
 			EnemyBulletBehavior bulletBehavior = bullet.GetComponent<EnemyBulletBehavior>();
 
 
-			bulletBehavior.moveDir = player.transform.position - spawnPosition;
+			bulletBehavior.moveDirectionNormilized = (player.transform.position - spawnPosition).normalized;
 			bulletBehavior.moveSpeed = enemyAttacks[getAttackSeed].bulletSpeed;
 			bulletBehavior.damage = enemyAttacks[getAttackSeed].damage;
 			if (enemyAttacks[getAttackSeed].particleEffect.Count > 0)
